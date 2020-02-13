@@ -1,0 +1,31 @@
+const express = require('express');
+const alpaca = require("./alpaca_core/index");
+const alpacas = require("./alpacas/models/_index");
+const mongoose = require("mongoose");
+const bodyParser = require('body-parser')
+
+const mongoURI = process.env.MONGO_URI || "mongodb://localhost/alpackages_tests";
+function connectWithRetry() {
+  return mongoose.connect( mongoURI, ( err ) => {
+    if ( err ) {
+      console.error( "Failed to connect to mongo on startup - retrying in 5 sec", err.message );
+      setTimeout( connectWithRetry, 5000 );
+    } else {
+      console.error( "Successfully connected to mongo - booting server." );
+    }
+  } );
+}
+connectWithRetry();
+
+const app = express();
+
+app.use( express.json( { limit: "5mb" } ) );
+app.use( express.urlencoded( { extended: false } ) );
+
+app.use( ( req, res, next ) => {
+  console.log( req.body )
+  next();
+})
+app.use("/api/user", alpacas.user.router );
+
+app.listen(3000);
