@@ -3,6 +3,9 @@ const express = require( "express" );
 const AlpacaType = require("./type");
 const validators = require("./validators");
 
+function isDefined( variable ) {
+  return typeof variable !== "undefined";
+}
 
 class AlpacaModel {
   constructor(name, props) {
@@ -49,7 +52,9 @@ class AlpacaModel {
     modelKeys.forEach( modelKey => {
       const modelValue = this.raw_model[ modelKey ];
       if ( modelValue && modelValue.type instanceof AlpacaType ) {
-        this.mongooseTemplate[ modelKey ] = modelValue.type.primitive;
+        this.mongooseTemplate[ modelKey ] = {
+          type: modelValue.type.primitive
+        }
       } else if ( modelValue instanceof AlpacaType ) {
         this.mongooseTemplate[ modelKey ] = modelValue.primitive;
       }

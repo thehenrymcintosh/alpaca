@@ -13,5 +13,8 @@ function toInt( val ) {
 
 module.exports = class AlpacaInt extends AlpacaType {
   primitive = Number;
-  castings = [ toInt ];
+  constructor( props ) {
+    super( props );
+    this.castings.unshift( toInt );
+  }
 }

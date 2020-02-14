@@ -2,10 +2,14 @@ const { Name }= require("../types/_index");
 const { Str, Int }= require("../../alpaca_core/types/_index");
 
 module.exports = {
-  first_name: new Name(),
-  last_name: {
-    type: new Str(),
-    required: false,
+  first_name: {
+    type: new Name(),
+    required: true,
   },
-  age: new Int({ validators: ( num ) => num > 0 })
+  last_name: new Name(),
+  age: new Int({ validators: ( num ) => num > 0 }),
+  middle_name: {
+    type: new Name(),
+    required: false,
+  }
 }

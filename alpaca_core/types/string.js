@@ -12,5 +12,8 @@ function strCast( value ) {
 }
 
 module.exports = class AlpacaString extends AlpacaType {
-  castings = [ strCast ];
+  constructor( props ) {
+    super( props );
+    this.castings.unshift( strCast );
+  }
 }
