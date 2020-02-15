@@ -1,5 +1,5 @@
 const { Name }= require("../types/_index");
-const { Str, Int }= require("../../alpaca_core/types/_index");
+const { Str, Int, Ref }= require("../../alpaca_core/types/_index");
 
 module.exports = {
   first_name: {
@@ -11,5 +11,11 @@ module.exports = {
   middle_name: {
     type: new Name(),
     required: false,
+  },
+  parent: {
+    type: new Ref(),
+    required: false,
+    populate: true,
+    ref: "User"
   }
 }

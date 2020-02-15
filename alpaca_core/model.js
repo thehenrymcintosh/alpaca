@@ -15,6 +15,7 @@ class AlpacaModel {
     this.raw_model = {
       ...props,
     }
+    this.populators = [];
     this.generateRouter();
     this.generateMongoose();
   }
@@ -49,11 +50,18 @@ class AlpacaModel {
   generateMongoose() {
     const modelKeys = Object.keys( this.raw_model );
     this.mongooseTemplate = {};
+    const alpaca = this;
     modelKeys.forEach( modelKey => {
       const modelValue = this.raw_model[ modelKey ];
       if ( modelValue && modelValue.type instanceof AlpacaType ) {
         this.mongooseTemplate[ modelKey ] = {
           type: modelValue.type.primitive
+        }
+        if ( modelValue.ref ) {
+          this.mongooseTemplate[ modelKey ].ref = modelValue.ref;
+        }
+        if ( modelValue.populate && modelValue.ref ) {
+          alpaca.populators.push( modelKey );
         }
       } else if ( modelValue instanceof AlpacaType ) {
         this.mongooseTemplate[ modelKey ] = modelValue.primitive;
@@ -98,6 +106,7 @@ class AlpacaModel {
     if ( !validators.isValidIdString( id ) ) throw new Error(`Invalid id: ${ id }`);
 
     alpaca.model.findById( id )
+    .populate( alpaca.populators.join(" ") )
     .exec()
     .then( ( doc ) => {
       res.locals[alpaca.locals_name] = doc;
@@ -110,6 +119,7 @@ class AlpacaModel {
     const { alpaca } = req;
 
     alpaca.model.find()
+    .populate( alpaca.populators.join(" ") )
     .exec()
     .then( ( docs ) => {
       res.locals[alpaca.locals_name + "s"] = docs;
