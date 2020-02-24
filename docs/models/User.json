@@ -1,0 +1,23 @@
+{
+  "title": "User",
+  "properties": {
+    "first_name": {
+      "type": "String",
+      "example": "Henry"
+    },
+    "last_name": {
+      "type": "String"
+    },
+    "age": {
+      "type": "Number",
+      "example": 32
+    },
+    "middle_name": {
+      "type": "String",
+      "example": "Gary"
+    },
+    "parent": {
+      "type": "ObjectId"
+    }
+  }
+}

@@ -15,6 +15,10 @@ function isValidName( name ) {
   return true;
 }
 
+function isValidFunction( func ) {
+  return !!(func && func.constructor && func.call && func.apply);
+}
+
 function isValidText( text ) {
   if ( !text
     || typeof text !== "string" ) return false;
@@ -164,4 +168,5 @@ module.exports = {
   getValidateMethodForType,
   validateObject,
   findInvalidIds,
+  isValidFunction,
 };

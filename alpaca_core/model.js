@@ -2,20 +2,82 @@ const mongoose = require("mongoose");
 const express = require( "express" );
 const AlpacaType = require("./type");
 const validators = require("./validators");
+const fs = require('fs');
+const path = require("path");
+const hash = require('object-hash');
+const { compile } = require('json-schema-to-typescript');
+
 
 function isDefined( variable ) {
   return typeof variable !== "undefined";
 }
+const storeData = (path, data, isJson) => {
+  try {
+    if ( isJson ) {
+      const json_data = JSON.stringify(data, null, 2);
+      fs.writeFileSync(path, json_data);
+    } else {
+      fs.writeFileSync(path, data);
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
 
+const loadData = (path, isJson) => {
+  try {
+    const data = fs.readFileSync(path, 'utf8');
+    if ( isJson ) {
+      return JSON.parse( data );
+    } else {
+      return data;
+    }
+  } catch (err) {
+    console.error(err)
+    return false
+  }
+}
+
+const saveIfChanged = (filePath, toWrite, isJson) => {
+  if (!fs.existsSync(filePath) ) {
+    // file doesn't exist, so write it
+    storeData( filePath, toWrite, isJson );
+  } else {
+    const loadedData = loadData( filePath, isJson );
+    if ( loadedData ) {
+      if ( hash(loadedData) === hash(toWrite) ) {
+        // no change
+      } else {
+        storeData( filePath, toWrite, isJson );
+      }
+    } else {
+      storeData( filePath, toWrite, isJson );
+    }
+  }
+}
+
+const primitiveToString = ( primitive ) => {
+  if ( validators.isValidFunction( primitive ) ) return primitive.name;
+  if ( validators.isValidText( primitive ) ) return primitive;
+  throw new Error(`Cannot cast primitive "${primitive}" to string!`)
+}
 class AlpacaModel {
-  constructor(name, props) {
+  constructor(name, props, options = {}) {
     this.name = name;
+    if ( name.indexOf(" ") >= 0 ) throw new Error("Model names cannot contain spaces! '" + name +"'");
     this.locals_name = name.toLowerCase();
     this.id_name = name.toLowerCase() + "_id";
     this.raw_model = {
       ...props,
     }
+    this.options = options;
     this.populators = [];
+    if ( this.options.generateOpenApi ) {
+      this.generateOpenApi();
+    }
+    if ( this.options.generateTs ) {
+      this.generateTs();
+    }
     this.generateRouter();
     this.generateMongoose();
   }
@@ -23,12 +85,9 @@ class AlpacaModel {
   generateRouter() {
     const alpaca = this;
     this.router = express.Router();
+    const alplacaMountMiddleware = this.getAlpacaMountMiddleware();
 
-    this.router.use( ( req, res, next ) => {
-      req.alpaca = alpaca;
-      next();
-    })
-
+    this.router.use( alplacaMountMiddleware )
     this.router.get("/", alpaca.index );
     this.router.get(`/:${this.id_name}`, alpaca.read );
     this.router.post(`/`, alpaca.create );
@@ -72,6 +131,74 @@ class AlpacaModel {
     this.model = mongoose.model( this.name, schema );
   }
 
+  generateOpenApi() {
+    const { dir, tags } = this.options.generateOpenApi;
+    if ( !validators.isValidText( dir ) ) throw new Error( "'options.generateOpenApi.dir' must be a valid path string for the output directory!");
+    if (!fs.existsSync(dir)){
+        fs.mkdirSync(dir, { recursive: true } );
+    }
+    const filePath = path.join(dir, `${this.name}.json`);
+    const toWrite = {
+      title: this.name,
+      properties: {},
+    }
+    if ( tags ) toWrite.tags = tags;
+    const modelKeys = Object.keys( this.raw_model );
+    modelKeys.forEach( modelKey => {
+      const modelValue = this.raw_model[ modelKey ];
+      if ( modelValue && modelValue.type instanceof AlpacaType ) {
+        toWrite.properties[ modelKey ] = {
+          type: primitiveToString(modelValue.type.primitive),
+        }
+        if ( modelValue.example ) {
+          toWrite.properties[ modelKey ].example = modelValue.example;
+        }
+      } else if ( modelValue instanceof AlpacaType ) {
+        toWrite.properties[ modelKey ] = {
+          type: primitiveToString(modelValue.primitive),
+        };
+      }
+    } )
+    saveIfChanged( filePath, toWrite, true );
+  }
+
+  generateTs() {
+    const { dir, additionalProperties, required } = this.options.generateTs;
+    if ( !validators.isValidText( dir ) ) throw new Error( "'options.generateTs.dir' must be a valid path string for the output directory!");
+    if (!fs.existsSync(dir)){
+      fs.mkdirSync(dir, { recursive: true } );
+    }
+    const filePath = path.join(dir, `${this.name}.ts`);
+    const toWrite = {
+      title: this.name,
+      type: "object",
+      properties: {},
+    }
+    if ( required && validators.isValidArray( required ) ) toWrite.required = required;
+    if ( additionalProperties && validators.isValidBool( additionalProperties ) ) toWrite.additionalProperties = additionalProperties;
+    const modelKeys = Object.keys( this.raw_model );
+    modelKeys.forEach( modelKey => {
+      const modelValue = this.raw_model[ modelKey ];
+      if ( modelValue && modelValue.type instanceof AlpacaType ) {
+        toWrite.properties[ modelKey ] = {
+          type: primitiveToString(modelValue.type.primitive).toLowerCase(),
+        }
+        if ( modelValue.description ) toWrite.properties[ modelKey ].description = modelValue.description;
+        if ( modelValue.enum && validators.isValidArray( modelValue.enum ) ) toWrite.properties[ modelKey ].enum = modelValue.enum;
+      } else if ( modelValue instanceof AlpacaType ) {
+        toWrite.properties[ modelKey ] = {
+          type: primitiveToString(modelValue.primitive).toLowerCase(),
+        };
+      }
+    } );
+    compile(toWrite, toWrite.title, {
+      bannerComment: "/* tslint:disable */\n/**\n* This file was automatically generated by json-schema-to-typescript in Alpaca.\n* DO NOT MODIFY IT BY HAND. Instead, modify the Alpaca model and this will regenerate the next time the server starts.\n*/"	
+    })
+      .then(ts => {
+        saveIfChanged( filePath, ts);
+      })
+  }
+
   cast( body = {} ) {
     const modelKeys = Object.keys( this.raw_model );
     const newBody = {};
@@ -98,6 +225,15 @@ class AlpacaModel {
         if ( !body[ modelKey ] ) throw new Error(`${this.name} ${modelKey} is required`);
       }
     } )
+  }
+
+  getAlpacaMountMiddleware() {
+    const alpaca = this;
+
+    return ( req, res, next ) => {
+      req.alpaca = alpaca;
+      next();
+    }
   }
 
   read( req, res, next ) {
