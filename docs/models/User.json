@@ -16,8 +16,17 @@
       "type": "String",
       "example": "Gary"
     },
+    "company_name": {
+      "type": "String",
+      "example": "Roar"
+    },
     "parent": {
       "type": "ObjectId"
     }
-  }
+  },
+  "required": [
+    "first_name",
+    "last_name",
+    "company_name"
+  ]
 }

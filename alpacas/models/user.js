@@ -19,6 +19,11 @@ module.exports = {
     required: false,
     example: "Gary"
   },
+  company_name: {
+    type: name,
+    required: true,
+    example: "Roar"
+  },
   parent: {
     type: new Ref(),
     required: false,

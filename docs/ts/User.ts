@@ -6,9 +6,10 @@
 
 export interface User {
   first_name: string;
-  last_name?: string;
+  last_name: string;
   age?: number;
   middle_name?: string;
+  company_name: string;
   parent?: {
     [k: string]: any;
   };
