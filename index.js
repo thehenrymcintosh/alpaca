@@ -28,4 +28,6 @@ app.use( ( req, res, next ) => {
 })
 app.use("/api/user", alpacas.user.router );
 
+// @todo nested objects and arrays of objects
+
 app.listen(3000);
