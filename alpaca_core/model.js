@@ -70,9 +70,9 @@ class AlpacaModel {
   generateRouter() {
     const alpaca = this;
     this.router = express.Router();
-    const alplacaMountMiddleware = this.getAlpacaMountMiddleware();
+    const alpacaMountMiddleware = this.getAlpacaMountMiddleware();
 
-    this.router.use( alplacaMountMiddleware )
+    this.router.use( alpacaMountMiddleware )
     this.router.get("/", alpaca.index );
     this.router.get(`/:${this.id_name}`, alpaca.read );
     this.router.post(`/`, alpaca.create );
