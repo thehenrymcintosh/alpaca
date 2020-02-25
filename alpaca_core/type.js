@@ -29,8 +29,9 @@ class AlpacaType {
         }
       }
     }
-    // @todo validate all the fields
-    // @todo add typescript defs for intellisense
+    // @todo improve developer experience by:
+    // validating all the fields
+    // add typescript defs for intellisense
   }
 
   primitive = String;

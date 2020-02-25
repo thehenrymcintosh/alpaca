@@ -1,65 +1,50 @@
 const mongoose = require("mongoose");
 const express = require( "express" );
 const AlpacaType = require("./type");
-const validators = require("./validators");
+const AlpacaArray = require("./types/array");
+
+const validators = require("./helpers/validators");
+const fileHandler = require("./helpers/fileHandler");
 const fs = require('fs');
 const path = require("path");
-const hash = require('object-hash');
 const { compile } = require('json-schema-to-typescript');
-
-
-function isDefined( variable ) {
-  return typeof variable !== "undefined";
-}
-const storeData = (path, data, isJson) => {
-  try {
-    if ( isJson ) {
-      const json_data = JSON.stringify(data, null, 2);
-      fs.writeFileSync(path, json_data);
-    } else {
-      fs.writeFileSync(path, data);
-    }
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-const loadData = (path, isJson) => {
-  try {
-    const data = fs.readFileSync(path, 'utf8');
-    if ( isJson ) {
-      return JSON.parse( data );
-    } else {
-      return data;
-    }
-  } catch (err) {
-    console.error(err)
-    return false
-  }
-}
-
-const saveIfChanged = (filePath, toWrite, isJson) => {
-  if (!fs.existsSync(filePath) ) {
-    // file doesn't exist, so write it
-    storeData( filePath, toWrite, isJson );
-  } else {
-    const loadedData = loadData( filePath, isJson );
-    if ( loadedData ) {
-      if ( hash(loadedData) === hash(toWrite) ) {
-        // no change
-      } else {
-        storeData( filePath, toWrite, isJson );
-      }
-    } else {
-      storeData( filePath, toWrite, isJson );
-    }
-  }
-}
 
 const primitiveToString = ( primitive ) => {
   if ( validators.isValidFunction( primitive ) ) return primitive.name;
   if ( validators.isValidText( primitive ) ) return primitive;
   throw new Error(`Cannot cast primitive "${primitive}" to string!`)
+}
+
+const extractType = ( mixedInput ) => {
+  if ( mixedInput instanceof AlpacaType ) {
+    return {
+      isAlpacaArray: false,
+      type: mixedInput,
+      rawObject: null,
+    }
+  } else if ( mixedInput instanceof AlpacaArray ) {
+    return {
+      isAlpacaArray: true,
+      type: mixedInput.type,
+      rawObject: null,
+    }
+  } else if ( validators.isValidObject( mixedInput ) && ( mixedInput.type instanceof AlpacaArray || mixedInput.type instanceof AlpacaType ) ) {
+    if ( mixedInput.type instanceof AlpacaType ) {
+      return {
+        isAlpacaArray: false,
+        type: mixedInput.type,
+        rawObject: mixedInput,
+      }
+    } else if ( mixedInput.type instanceof AlpacaArray ) {
+      return {
+        isAlpacaArray: true,
+        type: mixedInput.type.type,
+        rawObject: mixedInput,
+      }
+    }
+  } else {
+    throw new Error("Not AlpacaType or AlpacaArray, and also not an object with .type of type AlpacaType or AlpacaArray!");
+  }
 }
 class AlpacaModel {
   constructor(name, props, options = {}) {
@@ -93,17 +78,6 @@ class AlpacaModel {
     this.router.post(`/`, alpaca.create );
     this.router.post(`/:${this.id_name}`, alpaca.update );
     this.router.delete(`/:${this.id_name}`, alpaca.destroy );
-
-    this.router.use( ( req, res ) => {
-      res.json( res.locals );
-    })
-
-    this.router.use( ( err, req, res, next ) => {
-      res.json( {
-        error: err.message,
-        trace: err.stack,
-      } );
-    })
   }
 
   generateMongoose() {
@@ -112,25 +86,26 @@ class AlpacaModel {
     const alpaca = this;
     modelKeys.forEach( modelKey => {
       const modelValue = this.raw_model[ modelKey ];
-      if ( modelValue && modelValue.type instanceof AlpacaType ) {
-        this.mongooseTemplate[ modelKey ] = {
-          type: modelValue.type.primitive
-        }
-        if ( modelValue.ref ) this.mongooseTemplate[ modelKey ].ref = modelValue.ref;
-        if ( modelValue.populate && modelValue.ref ) alpaca.populators.push( modelKey );
-        if ( modelValue.required && validators.isValidBool( modelValue.required ) ) this.mongooseTemplate[ modelKey ].required = modelValue.required;
-      } else if ( modelValue instanceof AlpacaType ) {
-        this.mongooseTemplate[ modelKey ] = {
-          type: modelValue.primitive,
-          required: true,
-        };
+      const { rawObject, isAlpacaArray, type } = extractType(modelValue);
+      const newMongooseProp = { required: true };
+      if ( isAlpacaArray ) {
+        newMongooseProp.type = [ type.primitive ];
+      } else {
+        newMongooseProp.type = type.primitive;
       }
+      if ( rawObject ) {
+        if ( rawObject.ref ) newMongooseProp.ref = rawObject.ref;
+        if ( rawObject.populate && rawObject.ref ) alpaca.populators.push( modelKey );
+        if ( validators.isValidBool( rawObject.required ) ) newMongooseProp.required = rawObject.required;
+      }
+      this.mongooseTemplate[ modelKey ] = newMongooseProp;
     } )
     
     const schema = new mongoose.Schema( this.mongooseTemplate );
     this.model = mongoose.model( this.name, schema );
   }
 
+  // @todo update generateOpenApi to accommodate AlpacaArray
   generateOpenApi() {
     const { dir, tags } = this.options.generateOpenApi;
     if ( !validators.isValidText( dir ) ) throw new Error( "'options.generateOpenApi.dir' must be a valid path string for the output directory!");
@@ -162,9 +137,10 @@ class AlpacaModel {
     } );
     if ( required.length > 0 ) toWrite.required = required;
 
-    saveIfChanged( filePath, toWrite, true );
+    fileHandler.saveIfChanged( filePath, toWrite, true );
   }
 
+   // @todo update generateTs to accommodate AlpacaArray
   generateTs() {
     const { dir, additionalProperties } = this.options.generateTs;
     if ( !validators.isValidText( dir ) ) throw new Error( "'options.generateTs.dir' must be a valid path string for the output directory!");
@@ -202,7 +178,7 @@ class AlpacaModel {
       bannerComment: "/* tslint:disable */\n/**\n* This file was automatically generated by json-schema-to-typescript in Alpaca.\n* DO NOT MODIFY IT BY HAND. Instead, modify the Alpaca model and this will regenerate the next time the server starts.\n*/"	
     })
       .then(ts => {
-        saveIfChanged( filePath, ts);
+        fileHandler.saveIfChanged( filePath, ts);
       })
   }
 
@@ -211,9 +187,9 @@ class AlpacaModel {
     const newBody = {};
     modelKeys.forEach( modelKey => {
       const modelValue = this.raw_model[ modelKey ];
-      if ( modelValue && modelValue.type instanceof AlpacaType ) {
+      if ( modelValue && ( modelValue.type instanceof AlpacaType || modelValue.type instanceof AlpacaArray ) ) {
         newBody[ modelKey ] = modelValue.type.cast( body[ modelKey ] );
-      } else if ( modelValue instanceof AlpacaType ) {
+      } else if ( modelValue instanceof AlpacaType || modelValue instanceof AlpacaArray ) {
         newBody[ modelKey ] = modelValue.cast( body[ modelKey ] );
       }
     } )
@@ -224,10 +200,10 @@ class AlpacaModel {
     const modelKeys = Object.keys( this.raw_model );
     modelKeys.forEach( modelKey => {
       const modelValue = this.raw_model[ modelKey ];
-      if ( modelValue && modelValue.type instanceof AlpacaType ) {
+      if ( modelValue && (modelValue.type instanceof AlpacaType || modelValue.type instanceof AlpacaArray) ) {
         if ( !modelValue.type.validate( body[ modelKey ] ) ) throw new Error(`Invalid ${this.name} ${modelKey}: ${ body[ modelKey ]}`);
         if ( !body[ modelKey ] && modelValue.required ) throw new Error(`${this.name} ${modelKey} is required`);
-      } else if ( modelValue instanceof AlpacaType ) {
+      } else if ( modelValue instanceof AlpacaType || modelValue instanceof AlpacaArray ) {
         if ( !modelValue.validate( body[ modelKey ] ) ) throw new Error(`Invalid ${this.name} ${modelKey}: ${ body[ modelKey ]}`);
         if ( !body[ modelKey ] ) throw new Error(`${this.name} ${modelKey} is required`);
       }
@@ -276,6 +252,7 @@ class AlpacaModel {
 
     const { body } = req;
     const cast = alpaca.cast( body );
+    console.log( cast );
     alpaca.validate( cast );
     alpaca.model.create( cast )
       .then( ( doc ) => {

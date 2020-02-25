@@ -1,6 +1,5 @@
 const { Name }= require("../types/_index");
-const { Str, Int, Ref }= require("../../alpaca_core/types/_index");
-
+const { Str, Int, Ref, Arr }= require("../../alpaca_core/types/_index");
 const name = new Name();
 
 module.exports = {
@@ -15,13 +14,13 @@ module.exports = {
     example: 32,
   },
   middle_name: {
-    type: name,
+    type: new Arr(name),
     required: false,
-    example: "Gary"
+    example: ["Gary"]
   },
   company_name: {
     type: name,
-    required: true,
+    required: false,
     example: "Roar"
   },
   parent: {
