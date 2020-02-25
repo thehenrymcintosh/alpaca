@@ -63,8 +63,8 @@ class AlpacaModel {
     if ( this.options.generateTs ) {
       this.generateTs();
     }
-    this.generateRouter();
     this.generateMongoose();
+    this.generateRouter();
   }
 
   generateRouter() {
@@ -78,6 +78,24 @@ class AlpacaModel {
     this.router.post(`/`, alpaca.create );
     this.router.post(`/:${this.id_name}`, alpaca.update );
     this.router.delete(`/:${this.id_name}`, alpaca.destroy );
+    if ( validators.isValidArray( this.options.nestedRest ) ) {
+      this.options.nestedRest.forEach( route => {
+        this.router.get(`/:${this.id_name}/${route.path}`, ( req, res, next ) => {
+          const query = {};
+          const id = req.params[ this.id_name ];
+          query[`${route.foreignField}`] = id;
+
+          mongoose.model(route.modelName).find(query)
+            .exec()
+            .then( ( docs ) => {
+              res.locals[route.modelName.toLowerCase() + "s"] = docs;
+              next();
+            } )
+            .catch( next );
+          } );
+      })
+    }
+
   }
 
   generateMongoose() {
@@ -187,11 +205,8 @@ class AlpacaModel {
     const newBody = {};
     modelKeys.forEach( modelKey => {
       const modelValue = this.raw_model[ modelKey ];
-      if ( modelValue && ( modelValue.type instanceof AlpacaType || modelValue.type instanceof AlpacaArray ) ) {
-        newBody[ modelKey ] = modelValue.type.cast( body[ modelKey ] );
-      } else if ( modelValue instanceof AlpacaType || modelValue instanceof AlpacaArray ) {
-        newBody[ modelKey ] = modelValue.cast( body[ modelKey ] );
-      }
+      const { type } = extractType(modelValue);
+      newBody[ modelKey ] = type.cast( body[ modelKey ] );
     } )
     return newBody;
   }
@@ -200,19 +215,16 @@ class AlpacaModel {
     const modelKeys = Object.keys( this.raw_model );
     modelKeys.forEach( modelKey => {
       const modelValue = this.raw_model[ modelKey ];
-      if ( modelValue && (modelValue.type instanceof AlpacaType || modelValue.type instanceof AlpacaArray) ) {
-        if ( !modelValue.type.validate( body[ modelKey ] ) ) throw new Error(`Invalid ${this.name} ${modelKey}: ${ body[ modelKey ]}`);
-        if ( !body[ modelKey ] && modelValue.required ) throw new Error(`${this.name} ${modelKey} is required`);
-      } else if ( modelValue instanceof AlpacaType || modelValue instanceof AlpacaArray ) {
-        if ( !modelValue.validate( body[ modelKey ] ) ) throw new Error(`Invalid ${this.name} ${modelKey}: ${ body[ modelKey ]}`);
-        if ( !body[ modelKey ] ) throw new Error(`${this.name} ${modelKey} is required`);
-      }
+      const { rawObject, type } = extractType(modelValue);
+      let required = true;
+      if ( rawObject && validators.isValidBool(rawObject.required) ) required = rawObject.required;
+      if ( !type.validate( body[ modelKey ] ) ) throw new Error(`Invalid ${this.name} ${modelKey}: ${ body[ modelKey ]}`);
+      if ( !body[ modelKey ] && required ) throw new Error(`${this.name} ${modelKey} is required`);
     } )
   }
 
   getAlpacaMountMiddleware() {
     const alpaca = this;
-
     return ( req, res, next ) => {
       req.alpaca = alpaca;
       next();

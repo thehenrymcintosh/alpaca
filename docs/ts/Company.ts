@@ -4,15 +4,8 @@
  * DO NOT MODIFY IT BY HAND. Instead, modify the Alpaca model and this will regenerate the next time the server starts.
  */
 
-export interface User {
-  first_name: string;
-  last_name: string;
-  age?: number;
-  company?: {
-    [k: string]: any;
-  };
-  parent?: {
-    [k: string]: any;
-  };
+export interface Company {
+  name: string;
+  industry?: string;
   [k: string]: any;
 }

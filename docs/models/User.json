@@ -12,9 +12,8 @@
       "type": "Number",
       "example": 32
     },
-    "company_name": {
-      "type": "String",
-      "example": "Roar"
+    "company": {
+      "type": "ObjectId"
     },
     "parent": {
       "type": "ObjectId"

@@ -26,7 +26,9 @@ app.use( ( req, res, next ) => {
   console.log( req.body )
   next();
 })
+
 app.use("/api/user", alpacas.user.router );
+app.use("/api/company", alpacas.company.router );
 
 
 app.use( ( req, res ) => {

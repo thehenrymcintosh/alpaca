@@ -18,15 +18,16 @@ module.exports = {
     required: false,
     example: ["Gary"]
   },
-  company_name: {
-    type: name,
+  company: {
+    type: new Ref(),
     required: false,
-    example: "Roar"
+    populate: true,
+    ref: "Company"
   },
   parent: {
     type: new Ref(),
     required: false,
     populate: true,
-    ref: "User"
+    ref: "User",
   }
 }

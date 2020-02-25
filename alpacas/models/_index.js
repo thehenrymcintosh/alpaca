@@ -1,4 +1,5 @@
 const user = require("./user");
+const company = require("./company");
 const AlpacaModel = require("../../alpaca_core/model");
 const path = require("path");
 
@@ -12,14 +13,18 @@ const defaultOptions = {
   }
 }
 
-const userOptions = {
+const companyOptions = {
   ...defaultOptions,
 }
-userOptions.generateTs = {
-  ...userOptions.generateTs,
-  required: ["first_name"],
-}
+companyOptions.nestedRest = [
+  {
+    modelName: "User",
+    path: "users",
+    foreignField: "company",
+  }
+]
 
 module.exports = {
-  user: new AlpacaModel("User", user, userOptions ),
+  user: new AlpacaModel("User", user, defaultOptions ),
+  company: new AlpacaModel("Company", company, companyOptions ),
 }

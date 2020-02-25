@@ -1,0 +1,16 @@
+{
+  "title": "Company",
+  "properties": {
+    "name": {
+      "type": "String",
+      "example": "Roar Digital"
+    },
+    "industry": {
+      "type": "String",
+      "example": "Marketing"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}
