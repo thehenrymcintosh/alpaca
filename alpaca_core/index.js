@@ -1,5 +1,7 @@
-const router = require("./router");
+const Model = require("./model");
+const Types = require("./types/_index");
 
 module.exports = {
-  router,
+  Model,
+  Types,
 }

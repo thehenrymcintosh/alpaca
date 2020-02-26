@@ -1,4 +1,5 @@
-const { AlpacaString } = require("../../alpaca_core/types/_index");
+const { Types } = require("../../alpaca_core/index");
+const { AlpacaString } = Types;
 
 const name = class AlpacaName extends AlpacaString {
   constructor( props ) {

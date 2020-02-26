@@ -1,6 +1,6 @@
 const express = require('express');
 const alpaca = require("./alpaca_core/index");
-const alpacas = require("./alpacas/models/_index");
+const alpacas = require("./app/models/_index");
 const mongoose = require("mongoose");
 const bodyParser = require('body-parser')
 

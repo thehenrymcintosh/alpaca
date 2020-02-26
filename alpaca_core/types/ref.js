@@ -1,4 +1,4 @@
-const AlpacaType = require("../type");
+const AlpacaType = require("./type");
 const validators = require("../helpers/validators");
 const mongoose = require("mongoose");
 

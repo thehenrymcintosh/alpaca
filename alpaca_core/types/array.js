@@ -1,4 +1,4 @@
-const AlpacaType = require("../type");
+const AlpacaType = require("./type");
 
 const defaultOptions = {
   allowNullInArray: false,

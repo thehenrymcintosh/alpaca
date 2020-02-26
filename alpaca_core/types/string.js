@@ -1,4 +1,4 @@
-const AlpacaType = require("../type");
+const AlpacaType = require("./type");
 
 function strCast( value ) {
   if ( this.null_or_non_empty_trimmed_string ) {
