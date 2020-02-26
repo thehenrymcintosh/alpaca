@@ -1,7 +1,6 @@
-const { Str } = require("../../alpaca_core/types/_index");
-const AlpacaType = require("../../alpaca_core/type");
+const { AlpacaString } = require("../../alpaca_core/types/_index");
 
-const name = class AlpacaName extends Str {
+const name = class AlpacaName extends AlpacaString {
   constructor( props ) {
     super( props );
     this.validators.push( ( name ) => {

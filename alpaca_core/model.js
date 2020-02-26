@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const express = require( "express" );
-const AlpacaType = require("./type");
-const AlpacaArray = require("./types/array");
+
+const { AlpacaArray, AlpacaDate, AlpacaType } = require("./types/_index");
 
 const validators = require("./helpers/validators");
 const fileHandler = require("./helpers/fileHandler");
@@ -9,6 +9,9 @@ const fs = require('fs');
 const path = require("path");
 const { compile } = require('json-schema-to-typescript');
 const GlobalModelStore = {};
+
+const LastModified = new AlpacaDate({ castings: () => new Date() });
+const CreatedAt = new AlpacaDate();
 
 function getModelByName( name ) {
   return GlobalModelStore[ name.toLowerCase() ];
@@ -61,9 +64,12 @@ const extractType = ( mixedInput ) => {
     throw new Error("Not AlpacaType or AlpacaArray, and also not an object with .type of type AlpacaType or AlpacaArray!");
   }
 }
+
+// @todo add timestamp options and read-only properties
+// @todo 
 class AlpacaModel {
   constructor(name, props, options = {}) {
-    if ( GlobalModelStore[ name.toLowerCase() ] ) throw new Error("Model names must be unique!");
+    if ( getModelByName( name ) ) throw new Error("Model names must be unique!");
     this.name = name;
     if ( name.indexOf(" ") >= 0 ) throw new Error("Model names cannot contain spaces! '" + name +"'");
     this.locals_name = name.toLowerCase();
@@ -72,6 +78,10 @@ class AlpacaModel {
       ...props,
     }
     this.options = options;
+    if ( this.options.timestamps ) {
+      this.raw_model.last_modified_at = LastModified;
+      this.raw_model.created_at = { type: CreatedAt, readOnly: true };
+    }
     this.populators = [];
     this.nestedRoutes = [];
     if ( this.options.generateOpenApi ) {
@@ -177,7 +187,7 @@ class AlpacaModel {
       const { rawObject, type, isAlpacaArray } = extractType(modelValue);
       let isRequired = true;
       if ( rawObject && validators.isValidBool(rawObject.required) ) isRequired = rawObject.required;
-      if ( rawObject && rawObject.populate && validators.isValidName(rawObject.ref) && GlobalModelStore[rawObject.ref.toLowerCase()] ){
+      if ( rawObject && rawObject.populate && validators.isValidName(rawObject.ref) && getModelByName(rawObject.ref.toLowerCase()) ){
         if ( isAlpacaArray ) {
           toWrite.properties[ modelKey ] = {items: getModelByName(rawObject.ref).getOpenApiProperties()};
         } else {
@@ -215,7 +225,6 @@ class AlpacaModel {
 
   getTsProperties(){
     const { additionalProperties } = this.options.generateTs;
-
     const required = [];
     const toWrite = {
       title: this.name,
@@ -229,7 +238,7 @@ class AlpacaModel {
       const { isAlpacaArray, rawObject, type } = extractType(modelValue);
       let isRequired = true;
       if ( rawObject && validators.isValidBool(rawObject.required) ) isRequired = rawObject.required;
-      if ( rawObject && rawObject.populate && validators.isValidName(rawObject.ref) && GlobalModelStore[rawObject.ref.toLowerCase()] ){
+      if ( rawObject && rawObject.populate && validators.isValidName(rawObject.ref) && getModelByName(rawObject.ref.toLowerCase()) ){
         if ( isAlpacaArray ) {
           toWrite.properties[ modelKey ] = {items: getModelByName(rawObject.ref).getTsProperties()};
         } else {
@@ -275,8 +284,10 @@ class AlpacaModel {
     const newBody = {};
     modelKeys.forEach( modelKey => {
       const modelValue = this.raw_model[ modelKey ];
-      const { typeOrArray } = extractType(modelValue);
-      newBody[ modelKey ] = typeOrArray.cast( body[ modelKey ] );
+      const { rawObject, typeOrArray } = extractType(modelValue);
+      if ( !(rawObject && rawObject.readOnly) ){
+        newBody[ modelKey ] = typeOrArray.cast( body[ modelKey ] );
+      }
     } )
     return newBody;
   }
@@ -286,10 +297,14 @@ class AlpacaModel {
     modelKeys.forEach( modelKey => {
       const modelValue = this.raw_model[ modelKey ];
       const { rawObject, typeOrArray } = extractType(modelValue);
-      let required = true;
-      if ( rawObject && validators.isValidBool(rawObject.required) ) required = rawObject.required;
-      if ( !typeOrArray.validate( body[ modelKey ] ) ) throw new Error(`Invalid ${this.name} ${modelKey}: ${ body[ modelKey ]}`);
-      if ( !body[ modelKey ] && required ) throw new Error(`${this.name} ${modelKey} is required`);
+      if ( rawObject && rawObject.readOnly ){
+        if ( typeof body[ modelKey ] !== "undefined" ) throw new Error(`${this.name} ${modelKey} is read-only`);
+      } else {
+        let required = true;
+        if ( rawObject && validators.isValidBool(rawObject.required) ) required = rawObject.required;
+        if ( !typeOrArray.validate( body[ modelKey ] ) ) throw new Error(`Invalid ${this.name} ${modelKey}: ${ body[ modelKey ]}`);
+        if ( !body[ modelKey ] && required ) throw new Error(`${this.name} ${modelKey} is required`);
+      }
     } )
   }
 
@@ -335,6 +350,9 @@ class AlpacaModel {
     const { body } = req;
     const cast = alpaca.cast( body );
     alpaca.validate( cast );
+    if ( alpaca.options.timestamps ) {
+      cast.created_at = new Date();
+    }
     alpaca.model.create( cast )
       .then( ( doc ) => {
         res.locals[alpaca.locals_name] = doc;

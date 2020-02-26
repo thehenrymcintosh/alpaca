@@ -1,7 +1,8 @@
 const { Name }= require("../types/_index");
-const { Str, Int, Ref, Arr }= require("../../alpaca_core/types/_index");
+const { AlpacaString, AlpacaInt, AlpacaReference, AlpacaArray, AlpacaDate }= require("../../alpaca_core/types/_index");
 const name = new Name();
-const ref = new Ref();
+const ref = new AlpacaReference();
+
 module.exports = {
   first_name: {
     type: name,
@@ -10,22 +11,22 @@ module.exports = {
   },
   last_name: name,
   age: {
-    type: new Int({ validators: ( num ) => num > 0 }),
+    type: new AlpacaInt({ validators: ( num ) => num > 0 }),
     example: 32,
   },
   middle_name: {
-    type: new Arr(name),
+    type: new AlpacaArray(name),
     required: false,
     example: ["Gary"]
   },
   company: {
-    type: new Arr( ref ),
+    type: new AlpacaArray( ref ),
     required: false,
     populate: true,
     ref: "Company"
   },
   parent: {
-    type: new Ref(),
+    type: new AlpacaReference(),
     required: false,
     populate: true,
     ref: "User",

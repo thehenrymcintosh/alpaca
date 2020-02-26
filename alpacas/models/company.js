@@ -1,5 +1,5 @@
 const { Name }= require("../types/_index");
-const { Str, Int, Ref, Arr }= require("../../alpaca_core/types/_index");
+const { AlpacaString, AlpacaInt, AlpacaReference, AlpacaArray, AlpacaDate }= require("../../alpaca_core/types/_index");
 const name = new Name();
 
 module.exports = {

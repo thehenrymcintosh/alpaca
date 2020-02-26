@@ -26,22 +26,38 @@
           },
           "industry": {
             "type": "string"
+          },
+          "last_modified_at": {
+            "type": "date"
+          },
+          "created_at": {
+            "type": "date"
           }
         },
         "additionalProperties": false,
         "required": [
-          "name"
+          "name",
+          "last_modified_at",
+          "created_at"
         ]
       }
     },
     "parent": {
       "type": "string"
+    },
+    "last_modified_at": {
+      "type": "date"
+    },
+    "created_at": {
+      "type": "date"
     }
   },
   "additionalProperties": false,
   "required": [
     "first_name",
     "last_name",
-    "age"
+    "age",
+    "last_modified_at",
+    "created_at"
   ]
 }

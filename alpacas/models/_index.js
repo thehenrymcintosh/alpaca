@@ -10,7 +10,8 @@ const defaultOptions = {
   generateTs: {
     dir: path.join(__dirname, "..","..","docs","ts"),
     additionalProperties: false,
-  }
+  },
+  timestamps: true,
 }
 
 const companyOptions = {
