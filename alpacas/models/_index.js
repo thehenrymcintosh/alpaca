@@ -1,5 +1,5 @@
-const user = require("./user");
-const company = require("./company");
+const userSrc = require("./user");
+const companySrc = require("./company");
 const AlpacaModel = require("../../alpaca_core/model");
 const path = require("path");
 
@@ -23,8 +23,10 @@ companyOptions.nestedRest = [
     foreignField: "company",
   }
 ]
+const company = new AlpacaModel("Company", companySrc, companyOptions );
+const user = new AlpacaModel("User", userSrc, defaultOptions );
 
 module.exports = {
-  user: new AlpacaModel("User", user, defaultOptions ),
-  company: new AlpacaModel("Company", company, companyOptions ),
+  company,
+  user,
 }

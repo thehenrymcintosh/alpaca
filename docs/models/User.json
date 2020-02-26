@@ -12,15 +12,22 @@
       "type": "Number",
       "example": 32
     },
+    "middle_name": {
+      "type": "String",
+      "example": [
+        "Gary"
+      ]
+    },
     "company": {
-      "type": "ObjectId"
+      "type": "string"
     },
     "parent": {
-      "type": "ObjectId"
+      "type": "string"
     }
   },
   "required": [
     "first_name",
-    "last_name"
+    "last_name",
+    "age"
   ]
 }

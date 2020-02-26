@@ -7,5 +7,4 @@
 export interface Company {
   name: string;
   industry?: string;
-  [k: string]: any;
 }

@@ -7,12 +7,12 @@
 export interface User {
   first_name: string;
   last_name: string;
-  age?: number;
-  company?: {
-    [k: string]: any;
-  };
-  parent?: {
-    [k: string]: any;
-  };
-  [k: string]: any;
+  age: number;
+  middle_name?: string;
+  company?: Company;
+  parent?: string;
+}
+export interface Company {
+  name: string;
+  industry?: string;
 }
