@@ -6,10 +6,10 @@ const primitiveToString = ( primitive ) => {
     if ( primitive.name === "ObjectId" ){
       return "string";
     } else {
-      return primitive.name;
+      return primitive.name.toLowerCase();
     }
   } 
-  if ( validators.isValidText( primitive ) ) return primitive;
+  if ( validators.isValidText( primitive ) ) return primitive.toLowerCase();
   throw new Error(`Cannot cast primitive "${primitive}" to string!`)
 }
 

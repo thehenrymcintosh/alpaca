@@ -146,9 +146,9 @@ class AlpacaModel {
         }  
       } else {
         if ( isAlpacaArray ) {
-          toWrite.properties[ modelKey ] = { items: { type: primitiveToString(type.primitive).toLowerCase(), } }
+          toWrite.properties[ modelKey ] = { items: { type: primitiveToString(type.primitive), } }
         } else {
-          toWrite.properties[ modelKey ] = { type: primitiveToString(type.primitive).toLowerCase(), }
+          toWrite.properties[ modelKey ] = { type: primitiveToString(type.primitive), }
         }
       }
       if ( rawObject && rawObject.example ) toWrite.properties[ modelKey ].example = rawObject.example;
@@ -173,7 +173,7 @@ class AlpacaModel {
     fileHandler.saveIfChanged( filePath, toWrite, true );
   }
 
-
+  // @todo fix infinite recursion of definitions with references
   getTsProperties(){
     const { additionalProperties } = this.options.generateTs;
     const required = [];
@@ -197,9 +197,9 @@ class AlpacaModel {
         }  
       } else {
         if ( isAlpacaArray ) {
-          toWrite.properties[ modelKey ] = { items: { type: primitiveToString(type.primitive).toLowerCase(), } }
+          toWrite.properties[ modelKey ] = { items: { type: primitiveToString(type.primitive), } }
         } else {
-          toWrite.properties[ modelKey ] = { type: primitiveToString(type.primitive).toLowerCase(), }
+          toWrite.properties[ modelKey ] = { type: primitiveToString(type.primitive), }
         }
       }
       if ( rawObject && rawObject.description ) toWrite.properties[ modelKey ].description = rawObject.description;
