@@ -124,7 +124,6 @@ class AlpacaModel {
 
   }
 
-  // @todo still need to be able to save and populate array of references inmongodb
   generateMongoose() {
     const modelKeys = Object.keys( this.raw_model );
     this.mongooseTemplate = {};
@@ -133,19 +132,20 @@ class AlpacaModel {
       const modelValue = this.raw_model[ modelKey ];
       const { rawObject, isAlpacaArray, type } = extractType(modelValue);
       const newMongooseProp = { required: true };
-      if ( isAlpacaArray ) {
-        newMongooseProp.type = [ type.primitive ];
-      } else {
-        newMongooseProp.type = type.primitive;
-      }
+
+      newMongooseProp.type = type.primitive;
       if ( rawObject ) {
         if ( rawObject.ref ) newMongooseProp.ref = rawObject.ref;
         if ( rawObject.populate && rawObject.ref ) alpaca.populators.push( modelKey );
         if ( validators.isValidBool( rawObject.required ) ) newMongooseProp.required = rawObject.required;
       }
-      this.mongooseTemplate[ modelKey ] = newMongooseProp;
+      if ( isAlpacaArray ) {
+        this.mongooseTemplate[ modelKey ] = [newMongooseProp];
+      } else {
+        this.mongooseTemplate[ modelKey ] = newMongooseProp;
+      }
     } )
-    
+    console.log( this.mongooseTemplate );
     const schema = new mongoose.Schema( this.mongooseTemplate );
     this.model = mongoose.model( this.name, schema );
   }

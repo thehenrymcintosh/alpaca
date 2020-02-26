@@ -19,7 +19,7 @@ module.exports = {
     example: ["Gary"]
   },
   company: {
-    type: new Ref(),
+    type: new Arr( ref ),
     required: false,
     populate: true,
     ref: "Company"
