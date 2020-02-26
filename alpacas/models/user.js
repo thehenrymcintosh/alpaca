@@ -1,7 +1,7 @@
 const { Name }= require("../types/_index");
 const { Str, Int, Ref, Arr }= require("../../alpaca_core/types/_index");
 const name = new Name();
-
+const ref = new Ref();
 module.exports = {
   first_name: {
     type: name,

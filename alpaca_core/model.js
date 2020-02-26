@@ -23,7 +23,6 @@ const primitiveToString = ( primitive ) => {
     }
   } 
   if ( validators.isValidText( primitive ) ) return primitive;
-  if ( primitive === mongoose.Types.ObjectId ) return "string";
   throw new Error(`Cannot cast primitive "${primitive}" to string!`)
 }
 
@@ -125,6 +124,7 @@ class AlpacaModel {
 
   }
 
+  // @todo still need to be able to save and populate array of references inmongodb
   generateMongoose() {
     const modelKeys = Object.keys( this.raw_model );
     this.mongooseTemplate = {};
@@ -150,7 +150,40 @@ class AlpacaModel {
     this.model = mongoose.model( this.name, schema );
   }
 
-  // @todo update generateOpenApi to accommodate AlpacaArray
+
+  getOpenApiProperties() {
+    const toWrite = {
+      title: this.name,
+      properties: {},
+    }
+    const required = [];
+    if ( tags ) toWrite.tags = tags;
+    const modelKeys = Object.keys( this.raw_model );
+    modelKeys.forEach( modelKey => {
+      const modelValue = this.raw_model[ modelKey ];
+      const { rawObject, type, isAlpacaArray } = extractType(modelValue);
+      let isRequired = true;
+      if ( rawObject && validators.isValidBool(rawObject.required) ) isRequired = rawObject.required;
+      if ( rawObject && rawObject.populate && validators.isValidName(rawObject.ref) && GlobalModelStore[rawObject.ref.toLowerCase()] ){
+        if ( isAlpacaArray ) {
+          toWrite.properties[ modelKey ] = {items: getModelByName(rawObject.ref).getOpenApiProperties()};
+        } else {
+          toWrite.properties[ modelKey ] = getModelByName(rawObject.ref).getOpenApiProperties();
+        }  
+      } else {
+        if ( isAlpacaArray ) {
+          toWrite.properties[ modelKey ] = { items: { type: primitiveToString(type.primitive).toLowerCase(), } }
+        } else {
+          toWrite.properties[ modelKey ] = { type: primitiveToString(type.primitive).toLowerCase(), }
+        }
+      }
+      if ( rawObject && rawObject.example ) toWrite.properties[ modelKey ].example = rawObject.example;
+      if ( isRequired ) required.push( modelKey );
+    } );
+    if ( required.length > 0 ) toWrite.required = required;
+    return toWrite;
+  }
+
   generateOpenApi( newOptions ) {
     if ( newOptions && validators.isValidObject( newOptions ) ) this.options.generateOpenApi = newOptions;
 
@@ -161,26 +194,8 @@ class AlpacaModel {
     }
     const filePath = path.join(dir, `${this.name}.json`);
     this.options.generateOpenApi.filePath = filePath;
-    const toWrite = {
-      title: this.name,
-      properties: {},
-    }
-    const required = [];
-    if ( tags ) toWrite.tags = tags;
-    const modelKeys = Object.keys( this.raw_model );
-    modelKeys.forEach( modelKey => {
-      const modelValue = this.raw_model[ modelKey ];
-      const { rawObject, type } = extractType(modelValue);
-      let isRequired = true;
-      if ( rawObject && validators.isValidBool(rawObject.required) ) isRequired = rawObject.required;
-      toWrite.properties[ modelKey ] = {
-        type: primitiveToString(type.primitive),
-      }
-      if ( rawObject && rawObject.example ) toWrite.properties[ modelKey ].example = rawObject.example;
-      if ( isRequired ) required.push( modelKey );
-    } );
-    if ( required.length > 0 ) toWrite.required = required;
-
+    
+    const toWrite = this.getTsProperties();
     fileHandler.saveIfChanged( filePath, toWrite, true );
   }
 
@@ -198,25 +213,32 @@ class AlpacaModel {
     const modelKeys = Object.keys( this.raw_model );
     modelKeys.forEach( modelKey => {
       const modelValue = this.raw_model[ modelKey ];
-      const { rawObject, type } = extractType(modelValue);
+      const { isAlpacaArray, rawObject, type } = extractType(modelValue);
       let isRequired = true;
       if ( rawObject && validators.isValidBool(rawObject.required) ) isRequired = rawObject.required;
       if ( rawObject && rawObject.populate && validators.isValidName(rawObject.ref) && GlobalModelStore[rawObject.ref.toLowerCase()] ){
-          toWrite.properties[ modelKey ] = GlobalModelStore[rawObject.ref.toLowerCase()].getTsProperties();
+        if ( isAlpacaArray ) {
+          toWrite.properties[ modelKey ] = {items: getModelByName(rawObject.ref).getTsProperties()};
+        } else {
+          toWrite.properties[ modelKey ] = getModelByName(rawObject.ref).getTsProperties();
+        }  
       } else {
-        toWrite.properties[ modelKey ] = {
-          type: primitiveToString(type.primitive).toLowerCase(),
+        if ( isAlpacaArray ) {
+          toWrite.properties[ modelKey ] = { items: { type: primitiveToString(type.primitive).toLowerCase(), } }
+        } else {
+          toWrite.properties[ modelKey ] = { type: primitiveToString(type.primitive).toLowerCase(), }
         }
       }
       if ( rawObject && rawObject.description ) toWrite.properties[ modelKey ].description = rawObject.description;
       if ( rawObject && rawObject.enum && validators.isValidArray( rawObject.enum ) ) toWrite.properties[ modelKey ].enum = rawObject.enum;
       if ( isRequired ) required.push( modelKey );
     } );
+    console.log( toWrite );
 
     if ( required.length > 0 ) toWrite.required = required;
     return toWrite;
   }
-   // @todo update generateTs to accommodate AlpacaArray
+
   generateTs( newOptions ) {
     if ( newOptions && validators.isValidObject( newOptions ) ) this.options.generateTs = newOptions;
     const { dir } = this.options.generateTs;

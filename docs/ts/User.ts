@@ -8,8 +8,8 @@ export interface User {
   first_name: string;
   last_name: string;
   age: number;
-  middle_name?: string;
-  company?: Company;
+  middle_name?: string[];
+  company?: Company[];
   parent?: string;
 }
 export interface Company {

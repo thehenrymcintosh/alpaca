@@ -1,15 +1,15 @@
 {
   "title": "Company",
+  "type": "object",
   "properties": {
     "name": {
-      "type": "String",
-      "example": "Roar Digital"
+      "type": "string"
     },
     "industry": {
-      "type": "String",
-      "example": "Marketing"
+      "type": "string"
     }
   },
+  "additionalProperties": false,
   "required": [
     "name"
   ]

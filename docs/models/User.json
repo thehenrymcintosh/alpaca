@@ -1,30 +1,44 @@
 {
   "title": "User",
+  "type": "object",
   "properties": {
     "first_name": {
-      "type": "String",
-      "example": "Henry"
+      "type": "string"
     },
     "last_name": {
-      "type": "String"
+      "type": "string"
     },
     "age": {
-      "type": "Number",
-      "example": 32
+      "type": "number"
     },
     "middle_name": {
-      "type": "String",
-      "example": [
-        "Gary"
-      ]
+      "items": {
+        "type": "string"
+      }
     },
     "company": {
-      "type": "string"
+      "items": {
+        "title": "Company",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "industry": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "name"
+        ]
+      }
     },
     "parent": {
       "type": "string"
     }
   },
+  "additionalProperties": false,
   "required": [
     "first_name",
     "last_name",
