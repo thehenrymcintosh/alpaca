@@ -1,7 +1,7 @@
 const userSrc = require( "./user" );
 const companySrc = require( "./company" );
 
-const { Types, Model } = require( "../../src/index" );
+const { Types, Model } = require( "../../lib/index" );
 
 const { AlpacaString } = Types;
 

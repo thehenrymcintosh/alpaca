@@ -1,5 +1,5 @@
 const { Name } = require( "../types/_index" );
-const { Types } = require( "../../src/index" );
+const { Types } = require( "../../lib/index" );
 
 const {
   AlpacaString, AlpacaInt, AlpacaReference, AlpacaArray, AlpacaDate,

@@ -1,4 +1,4 @@
-const { Types } = require( "../../src/index" );
+const { Types } = require( "../../lib/index" );
 
 const { AlpacaString } = Types;
 

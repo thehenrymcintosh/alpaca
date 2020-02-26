@@ -1,7 +1,7 @@
 const express = require( "express" );
 const mongoose = require( "mongoose" );
 const bodyParser = require( "body-parser" );
-const alpaca = require( "./src/index" );
+const alpaca = require( "./lib/index" );
 const alpacas = require( "./app/models/_index" );
 
 const mongoURI = process.env.MONGO_URI || "mongodb://localhost/alpackages_tests";

@@ -4,8 +4,11 @@ module.exports = {
 			"node": true,
 			"mocha": true,
 	},
-	"extends": "airbnb",
-	"parser": "babel-eslint",
+	"extends": "airbnb-typescript",
+  "parser": "babel-eslint",
+  "parserOptions": {
+    project: './tsconfig.json',
+  },
 	"globals": {
 	},
 	"rules": {
