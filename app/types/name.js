@@ -1,4 +1,5 @@
-const { Types } = require("../../alpaca_core/index");
+const { Types } = require( "../../src/index" );
+
 const { AlpacaString } = Types;
 
 const name = class AlpacaName extends AlpacaString {
@@ -7,15 +8,15 @@ const name = class AlpacaName extends AlpacaString {
     this.validators.push( ( name ) => {
       if ( typeof name === "string" && name.length > 50 ) return false;
       return true;
-    } )
-    this.castings.push( function trimstr(name) { 
+    } );
+    this.castings.push( ( name ) => {
       try {
-        return name.trim() 
-      } catch (error) {
+        return name.trim();
+      } catch ( error ) {
         return name;
       }
-    } )
+    } );
   }
-}
+};
 
 module.exports = name;

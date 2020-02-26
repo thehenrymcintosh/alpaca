@@ -1,6 +1,9 @@
-const { Name }= require("../types/_index");
-const { Types } = require("../../alpaca_core/index");
-const { AlpacaString, AlpacaInt, AlpacaReference, AlpacaArray, AlpacaDate } = Types;
+const { Name } = require( "../types/_index" );
+const { Types } = require( "../../src/index" );
+
+const {
+  AlpacaString, AlpacaInt, AlpacaReference, AlpacaArray, AlpacaDate,
+} = Types;
 const name = new Name();
 const ref = new AlpacaReference();
 
@@ -8,28 +11,28 @@ module.exports = {
   first_name: {
     type: name,
     required: true,
-    example: "Henry"
+    example: "Henry",
   },
   last_name: name,
   age: {
-    type: new AlpacaInt({ validators: ( num ) => num > 0 }),
+    type: new AlpacaInt( { validators: ( num ) => num > 0 } ),
     example: 32,
   },
   middle_name: {
-    type: new AlpacaArray(name),
+    type: new AlpacaArray( name ),
     required: false,
-    example: ["Gary"]
+    example: [ "Gary" ],
   },
   company: {
     type: new AlpacaArray( ref ),
     required: false,
     populate: true,
-    ref: "Company"
+    ref: "Company",
   },
   parent: {
     type: new AlpacaReference(),
     required: false,
     populate: true,
     ref: "User",
-  }
-}
+  },
+};
