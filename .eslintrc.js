@@ -5,7 +5,7 @@ module.exports = {
 			"mocha": true,
 	},
 	"extends": "airbnb-typescript",
-  "parser": "babel-eslint",
+  // "parser": "babel-eslint",
   "parserOptions": {
     project: './tsconfig.json',
   },
