@@ -44,7 +44,6 @@ class AlpacaType {
     const alpaca = this;
     let valStore = value;
     for ( let i = 0; i < this.castings.length; i++ ) {
-      console.log( this.castings[ i ])
       let castFunction = this.castings[ i ].bind( alpaca );
       valStore = castFunction( valStore );
     }

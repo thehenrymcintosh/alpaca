@@ -145,7 +145,6 @@ class AlpacaModel {
         this.mongooseTemplate[ modelKey ] = newMongooseProp;
       }
     } )
-    console.log( this.mongooseTemplate );
     const schema = new mongoose.Schema( this.mongooseTemplate );
     this.model = mongoose.model( this.name, schema );
   }
@@ -233,7 +232,6 @@ class AlpacaModel {
       if ( rawObject && rawObject.enum && validators.isValidArray( rawObject.enum ) ) toWrite.properties[ modelKey ].enum = rawObject.enum;
       if ( isRequired ) required.push( modelKey );
     } );
-    console.log( toWrite );
 
     if ( required.length > 0 ) toWrite.required = required;
     return toWrite;
