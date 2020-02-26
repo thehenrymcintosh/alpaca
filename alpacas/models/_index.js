@@ -26,6 +26,12 @@ companyOptions.nestedRest = [
 const company = new AlpacaModel("Company", companySrc, companyOptions );
 const user = new AlpacaModel("User", userSrc, defaultOptions );
 
+user.pushNestedRoute("get","test", async (req, res, next) => { 
+  res.locals.test="oui";
+  res.locals.data = await req.alpaca.model.count();
+  next();
+});
+
 module.exports = {
   company,
   user,

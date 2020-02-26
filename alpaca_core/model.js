@@ -121,7 +121,21 @@ class AlpacaModel {
     this.nestedRoutes.forEach( route => {
       this.router[ route.method ]( `/:${this.id_name}/${route.path}`, route.middleware );
     })
+  }
 
+  pushNestedRoute( method, path, middleware ) {
+    const allowedMethods = ["get","put","post","delete","use"]
+    if ( !validators.isValidName( method ) ) throw new Error("Method must be valid text");
+    if ( allowedMethods.indexOf( method ) === -1 ) throw new Error("Method must be one of: " + allowedMethods.join(" ") );
+    if ( !validators.isValidName( path ) ) throw new Error("Path must be valid text");
+    if ( path.charAt(0) === "/" ) throw new Error("Path should not start with /");
+    if ( !validators.isValidFunction( middleware ) && !validators.isValidArray( middleware ) ) throw new Error("Middleware should be a function or array of functions");
+    this.nestedRoutes.push({
+      method, 
+      path,
+      middleware,
+    });
+    this.generateRouter();
   }
 
   generateMongoose() {
