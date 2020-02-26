@@ -65,8 +65,6 @@ const extractType = ( mixedInput ) => {
   }
 }
 
-// @todo add timestamp options and read-only properties
-// @todo 
 class AlpacaModel {
   constructor(name, props, options = {}) {
     if ( getModelByName( name ) ) throw new Error("Model names must be unique!");
