@@ -11,10 +11,12 @@ const defaultOptions : AlpacaArrayOptions = {
 
 
 class AlpacaArray {
-  constructor( props : AlpacaType, options = defaultOptions ) {
+  constructor( props : AlpacaType, options? : AlpacaArrayOptions ) {
     if ( !(props instanceof AlpacaType) ) throw new Error("Can only have arrays of AlpacaTypes");
     this.type = props;
-    this.options = options;
+    if ( typeof options !== "undefined" ){
+      this.options = options;
+    }
   }
 
   options: AlpacaArrayOptions = defaultOptions;

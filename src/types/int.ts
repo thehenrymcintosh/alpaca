@@ -14,7 +14,7 @@ const toInt : AlpacaCaster = function toInt( val ) {
 
 export default class AlpacaInt extends AlpacaType {
   primitive = Number;
-  constructor( props : AlpacaTypeOptions ) {
+  constructor( props? : AlpacaTypeOptions ) {
     super( props );
     this.castings.unshift( toInt );
   }

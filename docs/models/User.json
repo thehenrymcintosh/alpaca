@@ -1,63 +1,82 @@
 {
   "title": "User",
-  "type": "object",
   "properties": {
     "first_name": {
-      "type": "string"
+      "type": "string",
+      "example": "Henry"
     },
     "last_name": {
       "type": "string"
     },
     "age": {
-      "type": "number"
+      "type": "number",
+      "example": 32
     },
     "middle_name": {
       "items": {
         "type": "string"
-      }
+      },
+      "example": [
+        "Gary"
+      ]
     },
     "company": {
       "items": {
         "title": "Company",
-        "type": "object",
         "properties": {
           "name": {
-            "type": "string"
+            "type": "string",
+            "example": "Roar Digital"
           },
           "industry": {
-            "type": "string"
+            "type": "string",
+            "example": "Marketing"
           },
-          "last_modified_at": {
-            "type": "date"
+          "_id": {
+            "type": "string",
+            "readOnly": true
           },
-          "created_at": {
-            "type": "date"
+          "updatedAt": {
+            "type": "date",
+            "readOnly": true
+          },
+          "createdAt": {
+            "type": "date",
+            "readOnly": true
           }
         },
-        "additionalProperties": false,
         "required": [
           "name",
-          "last_modified_at",
-          "created_at"
-        ]
+          "_id",
+          "updatedAt",
+          "createdAt"
+        ],
+        "tags": []
       }
     },
     "parent": {
       "type": "string"
     },
-    "last_modified_at": {
-      "type": "date"
+    "_id": {
+      "type": "string",
+      "readOnly": true
     },
-    "created_at": {
-      "type": "date"
+    "updatedAt": {
+      "type": "date",
+      "readOnly": true
+    },
+    "createdAt": {
+      "type": "date",
+      "readOnly": true
     }
   },
-  "additionalProperties": false,
   "required": [
     "first_name",
     "last_name",
     "age",
-    "last_modified_at",
-    "created_at"
-  ]
+    "_id",
+    "updatedAt",
+    "createdAt"
+  ],
+  "tags": []
 }

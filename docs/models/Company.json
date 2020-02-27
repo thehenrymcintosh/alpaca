@@ -1,24 +1,32 @@
 {
   "title": "Company",
-  "type": "object",
   "properties": {
     "name": {
-      "type": "string"
+      "type": "string",
+      "example": "Roar Digital"
     },
     "industry": {
-      "type": "string"
+      "type": "string",
+      "example": "Marketing"
     },
-    "last_modified_at": {
-      "type": "date"
+    "_id": {
+      "type": "string",
+      "readOnly": true
     },
-    "created_at": {
-      "type": "date"
+    "updatedAt": {
+      "type": "date",
+      "readOnly": true
+    },
+    "createdAt": {
+      "type": "date",
+      "readOnly": true
     }
   },
-  "additionalProperties": false,
   "required": [
     "name",
-    "last_modified_at",
-    "created_at"
-  ]
+    "_id",
+    "updatedAt",
+    "createdAt"
+  ],
+  "tags": []
 }

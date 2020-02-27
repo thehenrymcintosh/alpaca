@@ -1,26 +1,65 @@
+import { SchemaDefinition, Model, Document } from "mongoose";
+import { Router, Request, Response, NextFunction } from "express";
+import { AlpacaArray, AlpacaType } from "./types/_index";
+import { AlpacaModelProp, AlpacaModelOptions, AlpacaModelOpenAPIOptions, AlpacaModelTSOptions } from "./types/tsdefs";
+interface AlpacaMongooseDocument extends Document {
+}
+declare module 'express-serve-static-core' {
+    interface Request {
+        alpaca?: AlpacaModel;
+    }
+}
+declare type middleware = ((req: Request, res: Response, next: NextFunction) => void | never);
+declare type anyObject = ({
+    [k: string]: any;
+});
+declare type nestedRouteAllowedMethods = "get" | "put" | "post" | "delete" | "use";
+interface nestedRoute {
+    method: nestedRouteAllowedMethods;
+    path: string;
+    middleware: middleware;
+}
 declare class AlpacaModel {
-    constructor(name: any, props: any, options?: {});
+    constructor(name: string, props: ({
+        [k: string]: AlpacaModelProp | AlpacaArray | AlpacaType;
+    }), options?: AlpacaModelOptions);
+    name: string;
+    populators: string[];
+    locals_name: string;
+    id_name: string;
+    raw_model: ({
+        [k: string]: AlpacaModelProp | AlpacaArray | AlpacaType;
+    });
+    mongooseTemplate: SchemaDefinition;
+    model: Model<AlpacaMongooseDocument> | undefined;
+    options: AlpacaModelOptions;
+    router?: Router;
+    nestedRoutes: nestedRoute[];
     generateRouter(): void;
-    pushNestedRoute(method: any, path: any, middleware: any): void;
+    pushNestedRoute(method: nestedRouteAllowedMethods, path: string, middleware: middleware): void;
     generateMongoose(): void;
     getOpenApiProperties(): {
-        title: any;
-        properties: {};
+        title: string;
+        properties: anyObject;
+        required: string[];
+        tags: string[];
     };
-    generateOpenApi(newOptions: any): void;
+    generateOpenApi(newOptions?: AlpacaModelOpenAPIOptions): void;
     getTsProperties(): {
-        title: any;
+        title: string;
         type: string;
-        properties: {};
+        properties: anyObject;
+        additionalProperties: boolean;
+        required: string[];
     };
-    generateTs(newOptions: any): void;
-    cast(body?: {}): {};
-    validate(body: any): void;
-    getAlpacaMountMiddleware(): (req: any, res: any, next: any) => void;
-    read(req: any, res: any, next: any): void;
-    index(req: any, res: any, next: any): void;
-    create(req: any, res: any, next: any): void;
-    update(req: any, res: any, next: any): void;
-    destroy(req: any, res: any, next: any): void;
+    generateTs(newOptions?: AlpacaModelTSOptions): void;
+    cast(body?: anyObject): anyObject;
+    validate(body: anyObject): void;
+    getAlpacaMountMiddleware: (this: AlpacaModel) => middleware;
+    read: middleware;
+    index: middleware;
+    create: middleware;
+    update: middleware;
+    destroy: middleware;
 }
 export default AlpacaModel;

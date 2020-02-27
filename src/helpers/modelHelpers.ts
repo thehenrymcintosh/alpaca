@@ -1,8 +1,8 @@
 import { AlpacaArray, AlpacaDate, AlpacaType } from "../types/_index";
 import validators from "./validators";
-import { AlpacaCaster, AlpacaValidator, AlpacaTypeOptions, AlapacaPrimitive } from "../types/tsdefs";
+import { AlpacaCaster, AlpacaValidator, AlpacaTypeOptions, AlapacaPrimitive, AlpacaModelProp } from "../types/tsdefs";
 
-const primitiveToString = ( primitive : AlapacaPrimitive ) => {
+export const primitiveToString = ( primitive : AlapacaPrimitive ) => {
   if ( validators.isValidFunction( primitive ) ) {
     if ( primitive.name === "ObjectId" ){
       return "string";
@@ -14,12 +14,15 @@ const primitiveToString = ( primitive : AlapacaPrimitive ) => {
 }
 
 type ArrayOrType = AlpacaType | AlpacaArray;
-interface modelProp {
-  type: ArrayOrType,
-  [k:string]: any
+
+interface extractedType {
+  isAlpacaArray: boolean,
+  rawObject: null | AlpacaModelProp
+  type: AlpacaType,
+  typeOrArray: AlpacaType | AlpacaArray
 }
 
-const extractType = ( mixedInput : ArrayOrType | modelProp ) => {
+export const extractType = ( mixedInput : ArrayOrType | AlpacaModelProp ) : extractedType => {
   if ( mixedInput instanceof AlpacaType ) {
     return {
       isAlpacaArray: false,
@@ -50,12 +53,6 @@ const extractType = ( mixedInput : ArrayOrType | modelProp ) => {
         typeOrArray: mixedInput.type,
       }
     }
-  } else {
-    throw new Error("Not AlpacaType or AlpacaArray, and also not an object with .type of type AlpacaType or AlpacaArray!");
-  }
-}
-
-export = {
-  primitiveToString,
-  extractType,
+  } 
+  throw new Error("Not AlpacaType or AlpacaArray, and also not an object with .type of type AlpacaType or AlpacaArray!");
 }

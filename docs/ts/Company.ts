@@ -7,10 +7,11 @@
 export interface Company {
   name: string;
   industry?: string;
-  last_modified_at: {
+  _id: string;
+  updatedAt: {
     [k: string]: any;
   };
-  created_at: {
+  createdAt: {
     [k: string]: any;
   };
 }

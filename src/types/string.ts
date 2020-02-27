@@ -13,7 +13,7 @@ const strCast : AlpacaCaster = function strCast( this:AlpacaString, value : any 
 }
 
 export default class AlpacaString extends AlpacaType {
-  constructor( props : AlpacaTypeOptions ) {
+  constructor( props? : AlpacaTypeOptions ) {
     super( props );
     this.castings.unshift( strCast );
   }

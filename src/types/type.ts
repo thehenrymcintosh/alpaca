@@ -4,7 +4,7 @@ import { AlpacaValidator, AlpacaCaster, AlapacaPrimitive, AlpacaTypeOptions } fr
 
 class AlpacaType {
 
-  constructor( props : AlpacaTypeOptions ) {
+  constructor( props? : AlpacaTypeOptions ) {
     if ( typeof props === 'object' && props !== null ) {
       const { 
         primitive, 

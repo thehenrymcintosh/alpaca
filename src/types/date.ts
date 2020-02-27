@@ -18,7 +18,7 @@ const toDate : AlpacaCaster = function toDate( val ) {
 
 export default class AlpacaDate extends AlpacaType {
   primitive = Date;
-  constructor( props : AlpacaTypeOptions ) {
+  constructor( props? : AlpacaTypeOptions ) {
     super( props );
     this.castings.unshift( toDate );
   }

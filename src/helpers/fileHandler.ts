@@ -1,7 +1,7 @@
 const fs = require('fs');
 const hash = require('object-hash');
 
-const storeData = (path : string, data : any , isJson : boolean) => {
+export const storeData = (path : string, data : any , isJson : boolean) => {
   try {
     if ( isJson ) {
       const json_data = JSON.stringify(data, null, 2);
@@ -14,7 +14,7 @@ const storeData = (path : string, data : any , isJson : boolean) => {
   }
 }
 
-const loadData = (path : string, isJson : boolean) => {
+export const loadData = (path : string, isJson : boolean) => {
   try {
     const data = fs.readFileSync(path, 'utf8');
     if ( isJson ) {
@@ -28,7 +28,7 @@ const loadData = (path : string, isJson : boolean) => {
   }
 }
 
-const saveIfChanged = (filePath : string, toWrite : any, isJson : boolean) => {
+export const saveIfChanged = (filePath : string, toWrite : any, isJson : boolean = false) => {
   if (!fs.existsSync(filePath) ) {
     // file doesn't exist, so write it
     storeData( filePath, toWrite, isJson );
@@ -44,10 +44,4 @@ const saveIfChanged = (filePath : string, toWrite : any, isJson : boolean) => {
       storeData( filePath, toWrite, isJson );
     }
   }
-}
-
-export = {
-  storeData,
-  loadData,
-  saveIfChanged,
 }

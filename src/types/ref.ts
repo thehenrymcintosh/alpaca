@@ -19,7 +19,7 @@ const isValidIdOrNull : AlpacaValidator = function isValidIdOrNull( val : any ) 
   return false;
 }
 export default class AlpacaRef extends AlpacaType {
-  constructor( props : AlpacaTypeOptions ) {
+  constructor( props? : AlpacaTypeOptions ) {
     super( props );
     this.primitive = Schema.Types.ObjectId;
     this.castings.unshift( IdCast );
