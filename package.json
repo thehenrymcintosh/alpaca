@@ -8,7 +8,7 @@
     "start": "node ./app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "dev": "tsc --watch & nodemon --ignore 'src/**/*'"
+    "dev": "tsc --watch & nodemon --ignore 'src/**/*'  ./app.js"
   },
   "author": "Henry McIntosh",
   "license": "MIT",
