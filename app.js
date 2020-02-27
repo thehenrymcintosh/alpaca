@@ -1,8 +1,9 @@
 const express = require( "express" );
 const mongoose = require( "mongoose" );
 const bodyParser = require( "body-parser" );
-const alpaca = require( "./lib/index" );
-const alpacas = require( "./app/models/_index" );
+const { AlpacaModel, AlpacaTypes, AlpacaValidators }  = require( "./lib/index" );
+// const alpacas = require( "./app/models/_index" );
+const path = require("path");
 
 const mongoURI = process.env.MONGO_URI || "mongodb://localhost/alpackages_tests";
 function connectWithRetry() {
@@ -27,8 +28,36 @@ app.use( ( req, res, next ) => {
   next();
 } );
 
-app.use( "/api/user", alpacas.user.router );
-app.use( "/api/company", alpacas.company.router );
+
+const { AlpacaString, AlpacaDate, AlpacaInt, AlpacaArray, AlpacaReference } = AlpacaTypes;
+const options = {
+  timestamps: true,
+  generateTs: {
+    dir: path.join( __dirname, ".", "docs", "ts" ),
+  },
+  generateOpenApi: {
+    dir: path.join( __dirname, ".", "docs", "ts" ),
+  }
+}
+
+const name = new AlpacaString( { 
+  validate: (name) => name && name.length < 20 
+} )
+
+const email = new AlpacaString( { 
+  validate: AlpacaValidators.isValidEmail 
+} )
+
+const user = new AlpacaModel("User", {
+  first_name: name,
+  last_name: name,
+  email: email,
+}, options )
+
+
+// app.use( "/api/user", alpacas.user.router );
+// app.use( "/api/company", alpacas.company.router );
+app.use( "/api/user", user.router );
 
 app.use( ( req, res ) => {
   res.json( res.locals );

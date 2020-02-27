@@ -35,9 +35,7 @@ export const saveIfChanged = (filePath : string, toWrite : any, isJson : boolean
   } else {
     const loadedData = loadData( filePath, isJson );
     if ( loadedData ) {
-      if ( hash(loadedData) === hash(toWrite) ) {
-        // no change
-      } else {
+      if ( hash(loadedData) !== hash(toWrite) ) {
         storeData( filePath, toWrite, isJson );
       }
     } else {

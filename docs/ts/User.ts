@@ -7,21 +7,7 @@
 export interface User {
   first_name: string;
   last_name: string;
-  age: number;
-  middle_name?: string[];
-  company?: Company[];
-  parent?: string;
-  _id: string;
-  updatedAt: {
-    [k: string]: any;
-  };
-  createdAt: {
-    [k: string]: any;
-  };
-}
-export interface Company {
-  name: string;
-  industry?: string;
+  email: string;
   _id: string;
   updatedAt: {
     [k: string]: any;

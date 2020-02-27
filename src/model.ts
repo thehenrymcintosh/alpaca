@@ -53,11 +53,6 @@ class AlpacaModel {
 
     // @todo use mongodb native timestamps
     // @todo add mongoose options to pass to schema
-    this.raw_model._id = { type: new AlpacaReference(), readOnly: true };
-    if ( this.options.timestamps ) {
-      this.raw_model.updatedAt = { type: RODate, readOnly: true };
-      this.raw_model.createdAt = { type: RODate, readOnly: true };
-    }
     this.populators = [];
     this.nestedRoutes = [];
     if ( this.options.generateOpenApi ) {
@@ -164,7 +159,7 @@ class AlpacaModel {
       schemaOptions.timestamps = alpaca.options.timestamps;
     }
 
-    const schema = new Schema( this.mongooseTemplate );
+    const schema = new Schema( this.mongooseTemplate, schemaOptions );
     this.model = new (model as any)( this.name, schema );
   }
 
@@ -176,7 +171,7 @@ class AlpacaModel {
       required: [] as string[],
       tags: [] as string[],
     }
-    const required: string[] = [];
+    const required: string[] = ["_id"];
     const modelKeys = Object.keys( this.raw_model );
     modelKeys.forEach( modelKey => {
       const modelValue = this.raw_model[ modelKey ];
@@ -202,6 +197,13 @@ class AlpacaModel {
       if ( rawObject && typeof rawObject.readOnly !== "undefined" ) toWrite.properties[ modelKey ].readOnly = rawObject.readOnly;
       if ( isRequired ) required.push( modelKey );
     } );
+    toWrite.properties._id = { type: "string", readOnly: true };
+    if ( this.options.timestamps ) {
+      toWrite.properties.updatedAt = { type: "date", readOnly: true };
+      toWrite.properties.createdAt = { type: "date", readOnly: true };
+      required.push("createdAt");
+      required.push("updatedAt");
+    }
     if ( required.length > 0 ) toWrite.required = required;
     return toWrite;
   }
@@ -229,7 +231,7 @@ class AlpacaModel {
     if ( !this.options.generateTs) throw new Error("Typescript options are not set");
 
     const { additionalProperties } = this.options.generateTs;
-    const required:string[] = [];
+    const required:string[] = ["_id"];
     const toWrite = {
       title: this.name,
       type: "object",
@@ -263,7 +265,13 @@ class AlpacaModel {
       if ( rawObject && rawObject.enum && validators.isValidArray( rawObject.enum ) ) toWrite.properties[ modelKey ].enum = rawObject.enum;
       if ( isRequired ) required.push( modelKey );
     } );
-
+    toWrite.properties._id = { type: "string", readOnly: true };
+    if ( this.options.timestamps ) {
+      toWrite.properties.updatedAt = { type: "date", readOnly: true };
+      toWrite.properties.createdAt = { type: "date", readOnly: true };
+      required.push("createdAt");
+      required.push("updatedAt");
+    }
     if ( required.length > 0 ) toWrite.required = required;
     return toWrite;
   }

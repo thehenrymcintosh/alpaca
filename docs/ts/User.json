@@ -1,0 +1,35 @@
+{
+  "title": "User",
+  "properties": {
+    "first_name": {
+      "type": "string"
+    },
+    "last_name": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "_id": {
+      "type": "string",
+      "readOnly": true
+    },
+    "updatedAt": {
+      "type": "date",
+      "readOnly": true
+    },
+    "createdAt": {
+      "type": "date",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "_id",
+    "first_name",
+    "last_name",
+    "email",
+    "createdAt",
+    "updatedAt"
+  ],
+  "tags": []
+}
