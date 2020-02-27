@@ -1,6 +1,6 @@
-const { Types } = require( "../../lib/index" );
+const { AlpacaTypes } = require( "../../lib/index" );
 
-const { AlpacaString } = Types;
+const { AlpacaString } = AlpacaTypes;
 
 const name = class AlpacaName extends AlpacaString {
   constructor( props ) {

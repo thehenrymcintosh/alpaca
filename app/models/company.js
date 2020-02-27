@@ -1,9 +1,9 @@
 const { Name } = require( "../types/_index" );
-const { Types } = require( "../../lib/index" );
+const { AlpacaTypes } = require( "../../lib/index" );
 
 const {
   AlpacaString, AlpacaInt, AlpacaReference, AlpacaArray, AlpacaDate,
-} = Types;
+} = AlpacaTypes;
 const name = new Name();
 
 module.exports = {

@@ -7,5 +7,5 @@ interface extractedType {
     type: AlpacaType;
     typeOrArray: AlpacaType | AlpacaArray;
 }
-export declare const extractType: (mixedInput: AlpacaType | AlpacaArray | AlpacaModelProp) => extractedType;
+export declare const extractType: (mixedInput: AlpacaArray | AlpacaType | AlpacaModelProp) => extractedType;
 export {};

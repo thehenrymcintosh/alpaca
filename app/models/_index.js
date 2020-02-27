@@ -1,9 +1,9 @@
 const userSrc = require( "./user" );
 const companySrc = require( "./company" );
 
-const { Types, Model } = require( "../../lib/index" );
+const { AlpacaTypes, AlpacaModel } = require( "../../lib/index" );
 
-const { AlpacaString } = Types;
+const { AlpacaString } = AlpacaTypes;
 
 const path = require( "path" );
 
@@ -28,8 +28,8 @@ companyOptions.nestedRest = [
     foreignField: "company",
   },
 ];
-const company = new Model( "Company", companySrc, companyOptions );
-const user = new Model( "User", userSrc, defaultOptions );
+const company = new AlpacaModel( "Company", companySrc, companyOptions );
+const user = new AlpacaModel( "User", userSrc, defaultOptions );
 
 user.pushNestedRoute( "get", "test", async ( req, res, next ) => {
   res.locals.test = "oui";

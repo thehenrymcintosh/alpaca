@@ -1,2 +1,2 @@
 # alpaca
-Single-source-of-truth for Express APIs
+Single-source-of-truth for Express / Mongodb APIs

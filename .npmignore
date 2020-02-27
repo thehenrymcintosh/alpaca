@@ -1,0 +1,9 @@
+app
+docs
+src
+node_modules
+app.js
+package-lock.json
+.eslint*
+tsconfig.json
+.gitignore
