@@ -1,7 +1,8 @@
-const { AlpacaArray, AlpacaDate, AlpacaType } = require("../types/_index");
-const validators = require("./validators");
+import { AlpacaArray, AlpacaDate, AlpacaType } from "../types/_index";
+import validators from "./validators";
+import { AlpacaCaster, AlpacaValidator, AlpacaTypeOptions, AlapacaPrimitive } from "../types/tsdefs";
 
-const primitiveToString = ( primitive ) => {
+const primitiveToString = ( primitive : AlapacaPrimitive ) => {
   if ( validators.isValidFunction( primitive ) ) {
     if ( primitive.name === "ObjectId" ){
       return "string";
@@ -9,11 +10,16 @@ const primitiveToString = ( primitive ) => {
       return primitive.name.toLowerCase();
     }
   } 
-  if ( validators.isValidText( primitive ) ) return primitive.toLowerCase();
   throw new Error(`Cannot cast primitive "${primitive}" to string!`)
 }
 
-const extractType = ( mixedInput ) => {
+type ArrayOrType = AlpacaType | AlpacaArray;
+interface modelProp {
+  type: ArrayOrType,
+  [k:string]: any
+}
+
+const extractType = ( mixedInput : ArrayOrType | modelProp ) => {
   if ( mixedInput instanceof AlpacaType ) {
     return {
       isAlpacaArray: false,
@@ -49,7 +55,7 @@ const extractType = ( mixedInput ) => {
   }
 }
 
-module.exports = {
+export = {
   primitiveToString,
   extractType,
 }

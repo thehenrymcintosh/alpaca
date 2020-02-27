@@ -1,5 +1,5 @@
-declare const AlpacaType: any;
-declare const validators: any;
-declare const mongoose: any;
-declare function IdCast(value: any): any;
-declare function isValidIdOrNull(val: any): boolean;
+import { AlpacaTypeOptions } from "./tsdefs";
+import AlpacaType from "./type";
+export default class AlpacaRef extends AlpacaType {
+    constructor(props: AlpacaTypeOptions);
+}

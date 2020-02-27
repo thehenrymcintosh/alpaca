@@ -1,11 +1,20 @@
-const AlpacaString = require("./string");
-const AlpacaInt = require("./int");
-const AlpacaReference = require("./ref");
-const AlpacaArray = require("./array");
-const AlpacaDate = require("./date");
-const AlpacaType = require("./type");
+import AlpacaString from "./string";
+import AlpacaInt from "./int";
+import AlpacaReference from "./ref";
+import AlpacaArray from "./array";
+import AlpacaDate from "./date";
+import AlpacaType from "./type";
 
-module.exports = {
+export {
+  AlpacaString,
+  AlpacaInt,
+  AlpacaReference,
+  AlpacaArray,
+  AlpacaDate,
+  AlpacaType,
+}
+
+export default {
   AlpacaString,
   AlpacaInt,
   AlpacaReference,

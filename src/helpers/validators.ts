@@ -1,6 +1,6 @@
 /* eslint-disable no-continue */
 /* eslint-disable complexity */
-const Mongoose = require( "mongoose" );
+import { Mongoose, Types } from "mongoose";
 
 /* eslint-disable max-len */
 /* eslint-disable no-useless-escape */
@@ -8,44 +8,44 @@ const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+")
 const bsonRegex = /^[a-f\d]{24}$/i;
 const urlRegex = /https?:\/\/((www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#()?&//=]*)|(localhost(:[0-9]{4})?))/i;
 
-function isValidName( name ) {
+function isValidName( name : any ) {
   if ( !name
     || typeof name !== "string"
     || name.length > 50 ) return false;
   return true;
 }
 
-function isValidFunction( func ) {
+function isValidFunction( func : any ) {
   return !!(func && func.constructor && func.call && func.apply);
 }
 
-function isValidText( text ) {
+function isValidText( text : any ) {
   if ( !text
     || typeof text !== "string" ) return false;
   return true;
 }
 
-function isValidBool( bool ) {
+function isValidBool( bool : any ) {
   if ( typeof bool !== "boolean" ) return false;
   return true;
 }
 
-function isValidDate( date ) {
+function isValidDate( date : any ) {
   if ( !date || typeof date !== "object" || typeof date.getFullYear !== "function" || typeof date.getTime !== "function" || typeof date.getTime() !== "number" ) return false;
   return true;
 }
 
-function isValidEmail( email ) {
+function isValidEmail( email : any ) {
   if ( !isValidName( email ) || !emailRegex.test( email ) ) return false;
   return true;
 }
 
-function isValidArray( arr ) {
+function isValidArray( arr : any ) {
   if ( !Array.isArray( arr ) ) return false;
   return true;
 }
 
-function isValidIdString( testId ) {
+function isValidIdString( testId : any ) {
   if ( !testId
     || typeof testId !== "string"
     || testId.length !== 24
@@ -53,20 +53,20 @@ function isValidIdString( testId ) {
   return true;
 }
 
-function isValidObject( obj ) {
+function isValidObject( obj : any ) {
   return obj === Object( obj )
     && !isValidArray( obj )
     && obj !== null
     && typeof obj !== "function";
 }
 
-function isValidId( testId ) {
+function isValidId( testId : any ) {
   if ( !testId
-    || !( testId instanceof Mongoose.Types.ObjectId ) ) return false;
+    || !( testId instanceof Types.ObjectId ) ) return false;
   return true;
 }
 
-function isValidUrl( url ) {
+function isValidUrl( url : any ) {
   if ( !url
     || typeof url !== "string"
     || url.length > 250
@@ -74,18 +74,18 @@ function isValidUrl( url ) {
   return true;
 }
 
-function isValidInt( num ) {
+function isValidInt( num : any ) {
   if ( typeof num !== "number"
   || !Number.isInteger( num ) ) return false;
   return true;
 }
 
-function isValidNumber( num ) {
+function isValidNumber( num : any ) {
   if ( typeof num !== "number" ) return false;
   return true;
 }
 
-function findInvalidIds( ids ) {
+function findInvalidIds( ids : any ) {
   const invalidIds = [];
   for ( let i = 0; i < ids.length; i += 1 ) {
     if ( !bsonRegex.test( ids[ i ] ) ) {
@@ -95,7 +95,7 @@ function findInvalidIds( ids ) {
   return invalidIds;
 }
 
-function getValidateMethodForType( type ) {
+function getValidateMethodForType( type : string ) {
   if ( type === "array" ) return isValidArray;
   if ( type === "bool" ) return isValidBool;
   if ( type === "date" ) return isValidDate;
@@ -111,48 +111,7 @@ function getValidateMethodForType( type ) {
   throw new Error( `No validation method for type: "${ type }"` );
 }
 
-function validateObject( target, schema ) {
-  if ( typeof schema !== "object" ) throw new Error( "Schema is not an object." );
-  if ( typeof target !== "object" ) throw new Error( "Target is not an object." );
-  const schemaKeys = Object.keys( schema ).sort();
-  const targetKeys = Object.keys( target ).sort();
-  const keyErr = new Error( `Schema keys (${ schemaKeys }) don't match target keys (${ Object.keys( target ).sort() }).` );
-  if ( schemaKeys.length !== targetKeys.length ) throw keyErr;
-  schemaKeys.forEach( ( key, index ) => {
-    if ( key !== targetKeys[ index ] ) {
-      throw keyErr;
-    }
-  } );
-  for ( let i = 0; i < schemaKeys.length; i += 1 ) {
-    const key = schemaKeys[ i ];
-    const compVal = schema[ key ];
-    if ( typeof schema[ key ] === "object" ) {
-      const isUndef = ( target[ key ] === undefined || target[ key ] === null || target[ key ] === "" );
-      if ( !compVal.optional && isUndef ) throw new Error( `Key "${ key }" is not optional and is not set.` );
-      if ( compVal.optional && isUndef ) {
-        continue;
-      }
-      if ( Array.isArray( compVal.allowedVals ) ) {
-        if ( compVal.allowedVals.indexOf( target[ key ] ) === -1 ) {
-          throw new Error( `Key "${ key }" value "${ target[ key ] }" (optional=${ !!compVal.optional }) is not an allowed value of this field. Must be one of ${ compVal.allowedVals }` );
-        }
-      } else {
-        const isValidParam = getValidateMethodForType( compVal.type )( target[ key ] );
-        if ( !isValidParam ) {
-          throw new Error( `Key "${ key }" value "${ target[ key ] }" (optional=${ !!compVal.optional }) is not a valid ${ compVal.type }.` );
-        }
-      }
-    } else {
-      const isValidParam = getValidateMethodForType( compVal )( target[ key ] );
-      if ( !isValidParam ) {
-        throw new Error( `Key "${ key }" value "${ target[ key ] }" is not a valid ${ compVal }.` );
-      }
-    }
-  }
-  return true;
-}
-
-module.exports = {
+export default {
   isValidArray,
   isValidBool,
   isValidDate,
@@ -166,7 +125,6 @@ module.exports = {
   isValidText,
   isValidObject,
   getValidateMethodForType,
-  validateObject,
   findInvalidIds,
   isValidFunction,
 };

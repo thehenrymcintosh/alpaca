@@ -15,7 +15,7 @@ module.exports = {
   },
   last_name: name,
   age: {
-    type: new AlpacaInt( { validators: ( num ) => num > 0 } ),
+    type: new AlpacaInt( { validate: ( num ) => num > 0 } ),
     example: 32,
   },
   middle_name: {

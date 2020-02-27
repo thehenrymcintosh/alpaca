@@ -1,7 +1,8 @@
-const AlpacaType = require("./type");
-const validators = require("../helpers/validators");
+import AlpacaType from "./type";
+import validators from "../helpers/validators";
+import { AlpacaCaster, AlpacaValidator, AlpacaTypeOptions } from "./tsdefs";
 
-function toDate( val ) {
+const toDate : AlpacaCaster = function toDate( val ) {
   if ( val === "" || typeof val === "undefined" ) {
     return null;
   }
@@ -15,9 +16,9 @@ function toDate( val ) {
   return parsed;
 }
 
-module.exports = class AlpacaDate extends AlpacaType {
+export default class AlpacaDate extends AlpacaType {
   primitive = Date;
-  constructor( props ) {
+  constructor( props : AlpacaTypeOptions ) {
     super( props );
     this.castings.unshift( toDate );
   }

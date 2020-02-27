@@ -1,17 +1,26 @@
-const AlpacaType = require("./type");
+import AlpacaType from "./type";
+import { AlpacaCaster, AlpacaValidator, AlpacaTypeOptions } from "./tsdefs";
 
-const defaultOptions = {
+interface AlpacaArrayOptions {
+  allowNullInArray: boolean,
+}
+
+const defaultOptions : AlpacaArrayOptions = {
   allowNullInArray: false,
 }
 
+
 class AlpacaArray {
-  constructor( props, options = defaultOptions ) {
-    if ( !props instanceof AlpacaType ) throw new Error("Can only have arrays of AlpacaTypes");
+  constructor( props : AlpacaType, options = defaultOptions ) {
+    if ( !(props instanceof AlpacaType) ) throw new Error("Can only have arrays of AlpacaTypes");
     this.type = props;
     this.options = options;
   }
 
-  cast( arrayOfValues ) {
+  options: AlpacaArrayOptions = defaultOptions;
+  type: AlpacaType;
+
+  cast( arrayOfValues: any[] ) {
     const alpaca = this;
     const returnArray = [];
     for ( let i=0; i < arrayOfValues.length; i++ ) {
@@ -20,7 +29,7 @@ class AlpacaArray {
     return returnArray;
   }
 
-  validate( arrayOfValues ) {
+  validate( arrayOfValues: any[] ) {
     const alpaca = this;
     for ( let i=0; i < arrayOfValues.length; i++ ) {
       if ( !alpaca.type.validate( arrayOfValues[i] ) ) {
@@ -34,4 +43,4 @@ class AlpacaArray {
   
 }
 
-module.exports = AlpacaArray;
+export default AlpacaArray;

@@ -1,26 +1,27 @@
-const AlpacaType = require("./type");
-const validators = require("../helpers/validators");
-const mongoose = require("mongoose");
+import { Types, Schema } from "mongoose";
+import { AlpacaCaster, AlpacaValidator, AlpacaTypeOptions } from "./tsdefs";
 
-function IdCast( value ) {
+import AlpacaType from "./type";
+import validators from "../helpers/validators";
+
+const IdCast : AlpacaCaster = function IdCast( value : any ) : Types.ObjectId | null {
   if ( validators.isValidIdString( value ) ) {
-    return mongoose.Types.ObjectId( value );
+    return Types.ObjectId( value );
   } else {
     return null;
   }
 }
 
-function isValidIdOrNull( val ) {
+const isValidIdOrNull : AlpacaValidator = function isValidIdOrNull( val : any ) : boolean {
   if ( validators.isValidId( val ) || val === null ) {
     return true;
   }
   return false;
 }
-
-module.exports = class AlpacaRef extends AlpacaType {
-  constructor( props ) {
+export default class AlpacaRef extends AlpacaType {
+  constructor( props : AlpacaTypeOptions ) {
     super( props );
-    this.primitive = mongoose.Schema.Types.ObjectId;
+    this.primitive = Schema.Types.ObjectId;
     this.castings.unshift( IdCast );
     this.validators.unshift( isValidIdOrNull );
   }

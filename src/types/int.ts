@@ -1,7 +1,8 @@
-const AlpacaType = require("./type");
+import AlpacaType from "./type";
+import { AlpacaCaster, AlpacaValidator, AlpacaTypeOptions } from "./tsdefs";
 
 
-function toInt( val ) {
+const toInt : AlpacaCaster = function toInt( val ) {
   if ( val === "" || typeof val === "undefined" ) {
     return null;
   }
@@ -11,9 +12,9 @@ function toInt( val ) {
   return parsed;
 }
 
-module.exports = class AlpacaInt extends AlpacaType {
+export default class AlpacaInt extends AlpacaType {
   primitive = Number;
-  constructor( props ) {
+  constructor( props : AlpacaTypeOptions ) {
     super( props );
     this.castings.unshift( toInt );
   }

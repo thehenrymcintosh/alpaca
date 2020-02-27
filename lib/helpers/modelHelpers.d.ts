@@ -1,9 +1,32 @@
-declare const AlpacaArray: any, AlpacaDate: any, AlpacaType: any;
-declare const validators: any;
-declare const primitiveToString: (primitive: any) => any;
-declare const extractType: (mixedInput: any) => {
-    isAlpacaArray: boolean;
-    type: any;
-    rawObject: any;
-    typeOrArray: any;
-} | undefined;
+import { AlpacaArray, AlpacaType } from "../types/_index";
+import { AlapacaPrimitive } from "../types/tsdefs";
+declare type ArrayOrType = AlpacaType | AlpacaArray;
+interface modelProp {
+    type: ArrayOrType;
+    [k: string]: any;
+}
+declare const _default: {
+    primitiveToString: (primitive: AlapacaPrimitive) => string;
+    extractType: (mixedInput: AlpacaType | AlpacaArray | modelProp) => {
+        isAlpacaArray: boolean;
+        type: AlpacaType;
+        rawObject: null;
+        typeOrArray: AlpacaType;
+    } | {
+        isAlpacaArray: boolean;
+        type: AlpacaType;
+        rawObject: null;
+        typeOrArray: AlpacaArray;
+    } | {
+        isAlpacaArray: boolean;
+        type: AlpacaType;
+        rawObject: modelProp;
+        typeOrArray: AlpacaType;
+    } | {
+        isAlpacaArray: boolean;
+        type: AlpacaType;
+        rawObject: modelProp;
+        typeOrArray: AlpacaArray;
+    } | undefined;
+};
+export = _default;

@@ -1,6 +1,7 @@
-const AlpacaType = require("./type");
+import AlpacaType from "./type";
+import { AlpacaCaster, AlpacaTypeOptions } from "./tsdefs";
 
-function strCast( value ) {
+const strCast : AlpacaCaster = function strCast( this:AlpacaString, value : any ) {
   if ( this.null_or_non_empty_trimmed_string ) {
     if ( !value || value.trim().length === 0 ) {
       return null;
@@ -11,8 +12,8 @@ function strCast( value ) {
   return value;
 }
 
-module.exports = class AlpacaString extends AlpacaType {
-  constructor( props ) {
+export default class AlpacaString extends AlpacaType {
+  constructor( props : AlpacaTypeOptions ) {
     super( props );
     this.castings.unshift( strCast );
   }

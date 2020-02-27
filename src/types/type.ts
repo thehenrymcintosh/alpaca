@@ -1,12 +1,16 @@
+import { Schema } from "mongoose";
+
+import { AlpacaValidator, AlpacaCaster, AlapacaPrimitive, AlpacaTypeOptions } from "./tsdefs";
+
 class AlpacaType {
 
-  constructor( props ) {
+  constructor( props : AlpacaTypeOptions ) {
     if ( typeof props === 'object' && props !== null ) {
       const { 
         primitive, 
         null_or_non_empty_trimmed_string,
-        validators,
-        castings,
+        validate,
+        cast,
       } = props;
       if ( typeof primitive !== 'undefined') {
         this.primitive = primitive;
@@ -14,18 +18,18 @@ class AlpacaType {
       if ( typeof null_or_non_empty_trimmed_string !== 'undefined' ) {
         this.null_or_non_empty_trimmed_string = null_or_non_empty_trimmed_string;
       }
-      if ( typeof validators !== 'undefined') {
-        if ( Array.isArray( validators ) ) {
-          this.validators.push( ...validators);
+      if ( typeof validate !== 'undefined') {
+        if ( Array.isArray( validate ) ) {
+          this.validators.push( ...validate);
         } else {
-          this.validators.push( validators);
+          this.validators.push( validate );
         }
       }
-      if ( typeof castings !== 'undefined') {
-        if ( Array.isArray( castings ) ) {
-          this.castings.push( ...castings);
+      if ( typeof cast !== 'undefined') {
+        if ( Array.isArray( cast ) ) {
+          this.castings.push( ...cast);
         } else {
-          this.castings.push( castings);
+          this.castings.push( cast);
         }
       }
     }
@@ -34,13 +38,13 @@ class AlpacaType {
     // add typescript defs for intellisense
   }
 
-  primitive = String;
-  null_or_non_empty_trimmed_string = true;
+  primitive : AlapacaPrimitive = String;
+  null_or_non_empty_trimmed_string : boolean = true;
 
-  validators = [];
-  castings = [];
+  validators: AlpacaValidator[] = [] ;
+  castings : AlpacaCaster[] = [] ;
 
-  cast( value ) {
+  cast( value : any ) {
     const alpaca = this;
     let valStore = value;
     for ( let i = 0; i < this.castings.length; i++ ) {
@@ -50,7 +54,7 @@ class AlpacaType {
     return valStore;
   }
 
-  validate( value ) {
+  validate( value : any ) {
     const alpaca = this;
     for ( let i =0; i < this.validators.length; i++ ) {
       let validationFunction = this.validators[ i ].bind( alpaca );
@@ -63,4 +67,4 @@ class AlpacaType {
   
 }
 
-module.exports = AlpacaType;
+export default AlpacaType;

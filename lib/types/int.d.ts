@@ -1,2 +1,6 @@
-declare const AlpacaType: any;
-declare function toInt(val: any): number | null;
+import AlpacaType from "./type";
+import { AlpacaTypeOptions } from "./tsdefs";
+export default class AlpacaInt extends AlpacaType {
+    primitive: NumberConstructor;
+    constructor(props: AlpacaTypeOptions);
+}
