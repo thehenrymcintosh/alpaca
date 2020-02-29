@@ -1,0 +1,27 @@
+{
+  "title": "Company",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "_id": {
+      "type": "string",
+      "readOnly": true
+    },
+    "updatedAt": {
+      "type": "date",
+      "readOnly": true
+    },
+    "createdAt": {
+      "type": "date",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "_id",
+    "name",
+    "createdAt",
+    "updatedAt"
+  ],
+  "tags": []
+}

@@ -6,7 +6,6 @@
 
 export interface Company {
   name: string;
-  industry?: string;
   _id: string;
   updatedAt: {
     [k: string]: any;

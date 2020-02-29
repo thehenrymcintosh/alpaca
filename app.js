@@ -30,6 +30,15 @@ app.use( ( req, res, next ) => {
 
 
 const { AlpacaString, AlpacaDate, AlpacaInt, AlpacaArray, AlpacaReference } = AlpacaTypes;
+
+const name = new AlpacaString( { 
+  validate: (name) => name && name.length < 50 
+} )
+
+const email = new AlpacaString( { 
+  validate: AlpacaValidators.isValidEmail 
+} )
+const ref = new AlpacaReference();
 const options = {
   timestamps: true,
   generateTs: {
@@ -37,26 +46,28 @@ const options = {
   },
   generateOpenApi: {
     dir: path.join( __dirname, ".", "docs", "ts" ),
-  }
+  },
 }
-
-const name = new AlpacaString( { 
-  validate: (name) => name && name.length < 20 
-} )
-
-const email = new AlpacaString( { 
-  validate: AlpacaValidators.isValidEmail 
-} )
+const company = new AlpacaModel("Company", {
+  name: name,
+}, {
+  ...options,
+  nestedRest: [{path:"users",foreignField:"company",modelName:"User"}]
+})
 
 const user = new AlpacaModel("User", {
   first_name: name,
   last_name: name,
   email: email,
+  company: {
+    type: new AlpacaArray( ref),
+    ref: "Company",
+    populate: true,
+  }
 }, options )
 
 
-// app.use( "/api/user", alpacas.user.router );
-// app.use( "/api/company", alpacas.company.router );
+app.use( "/api/company", company.router );
 app.use( "/api/user", user.router );
 
 app.use( ( req, res ) => {

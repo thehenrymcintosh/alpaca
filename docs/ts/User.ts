@@ -8,6 +8,17 @@ export interface User {
   first_name: string;
   last_name: string;
   email: string;
+  company: Company[];
+  _id: string;
+  updatedAt: {
+    [k: string]: any;
+  };
+  createdAt: {
+    [k: string]: any;
+  };
+}
+export interface Company {
+  name: string;
   _id: string;
   updatedAt: {
     [k: string]: any;
