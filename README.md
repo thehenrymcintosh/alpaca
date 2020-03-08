@@ -187,6 +187,7 @@ interface AlpacaModelOptions {
   generateOpenApi?: AlpacaModelOpenAPIOptions;
   nestedRest?:AlpacaNestedRestOptions[];
   timestamps?: boolean;
+  schemaCallback?: (( Schema: Schema ) => void )
 }
 ```
 
@@ -194,6 +195,8 @@ The key properties on the AlpacaModel are `router`, which is an Express router w
 
 You can add a nested http method using the following method
 `pushNestedRoute( method:nestedRouteAllowedMethods, path:string, middleware:middleware )`
+
+The mongoose schema can be accessed in the schemaCallback function, if provided in the options. This can be used to add indexes, static methods, etc, before the model is created.
 
 ## Built With
 
