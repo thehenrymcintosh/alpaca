@@ -41,4 +41,5 @@ export interface AlpacaModelOptions {
     generateOpenApi?: AlpacaModelOpenAPIOptions;
     nestedRest?: AlpacaNestedRestOptions[];
     timestamps?: boolean;
+    schemaCallback?: ((Schema: Schema) => void);
 }

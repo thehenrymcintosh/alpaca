@@ -1,4 +1,4 @@
-import { Schema } from "mongoose";
+import { Schema, SchemaDefinition } from "mongoose";
 import AlpacaArray from "./array";
 import AlpacaType from "./type";
 
@@ -47,4 +47,5 @@ export interface AlpacaModelOptions {
   generateOpenApi?: AlpacaModelOpenAPIOptions;
   nestedRest?:AlpacaNestedRestOptions[];
   timestamps?: boolean;
+  schemaCallback?: (( Schema: Schema ) => void )
 }

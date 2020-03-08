@@ -6,11 +6,11 @@
 
 export interface Company {
   name: string;
+  /**
+   * My description
+   */
+  founded: Date[];
   _id: string;
-  updatedAt: {
-    [k: string]: any;
-  };
-  createdAt: {
-    [k: string]: any;
-  };
+  updatedAt: Date;
+  createdAt: Date;
 }

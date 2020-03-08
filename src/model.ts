@@ -1,7 +1,7 @@
 import { Schema, model, SchemaDefinition, Model, Document } from "mongoose";
 import { Router, Request, Response, NextFunction } from "express";
 
-import { primitiveToString, extractType } from "./helpers/modelHelpers";
+import { primitiveToString, extractType, getTypeDefObject } from "./helpers/modelHelpers";
 
 import { AlpacaArray, AlpacaDate, AlpacaType, AlpacaReference } from "./types/_index";
 import { AlpacaModelProp, AlpacaModelOptions, AlpacaModelOpenAPIOptions, AlpacaModelTSOptions } from "./types/tsdefs";
@@ -51,7 +51,6 @@ class AlpacaModel {
     }
     this.options = options;
 
-    // @todo use mongodb native timestamps
     // @todo add mongoose options to pass to schema
     this.populators = [];
     this.nestedRoutes = [];
@@ -160,6 +159,9 @@ class AlpacaModel {
     }
 
     const schema = new Schema( this.mongooseTemplate, schemaOptions );
+    if ( this.options.schemaCallback && validators.isValidFunction( this.options.schemaCallback ) ) {
+      this.options.schemaCallback( schema );
+    }
     this.model = new (model as any)( this.name, schema );
   }
 
@@ -256,9 +258,9 @@ class AlpacaModel {
         }  
       } else {
         if ( isAlpacaArray ) {
-          toWrite.properties[ modelKey ] = { items: { type: primitiveToString(type.primitive), } }
+          toWrite.properties[ modelKey ] = { items: getTypeDefObject(type.primitive) };
         } else {
-          toWrite.properties[ modelKey ] = { type: primitiveToString(type.primitive), }
+          toWrite.properties[ modelKey ] = getTypeDefObject(type.primitive);
         }
       }
       if ( rawObject && rawObject.description ) toWrite.properties[ modelKey ].description = rawObject.description;
@@ -267,8 +269,8 @@ class AlpacaModel {
     } );
     toWrite.properties._id = { type: "string", readOnly: true };
     if ( this.options.timestamps ) {
-      toWrite.properties.updatedAt = { type: "date", readOnly: true };
-      toWrite.properties.createdAt = { type: "date", readOnly: true };
+      toWrite.properties.updatedAt = { type: 'object', tsType: 'Date', readOnly: true };
+      toWrite.properties.createdAt = { type: 'object', tsType: 'Date', readOnly: true };
       required.push("createdAt");
       required.push("updatedAt");
     }
@@ -348,6 +350,7 @@ class AlpacaModel {
     .catch( next );
   }
 
+  
   index: middleware = function( req, res, next ) {
     const { alpaca } = req;
     if ( !alpaca || typeof alpaca.model === "undefined" ) throw new Error("Alpaca model not initialised");

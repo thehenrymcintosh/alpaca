@@ -17,6 +17,11 @@
           "name": {
             "type": "string"
           },
+          "founded": {
+            "items": {
+              "type": "date"
+            }
+          },
           "_id": {
             "type": "string",
             "readOnly": true
@@ -33,6 +38,7 @@
         "required": [
           "_id",
           "name",
+          "founded",
           "createdAt",
           "updatedAt"
         ],

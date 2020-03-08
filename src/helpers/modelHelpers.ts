@@ -13,6 +13,16 @@ export const primitiveToString = ( primitive : AlapacaPrimitive ) => {
   throw new Error(`Cannot cast primitive "${primitive}" to string!`)
 }
 
+export const getTypeDefObject = ( primitive: AlapacaPrimitive ) => {
+  if ( validators.isValidFunction( primitive ) ) {
+    if ( primitive.name === "Date" ){
+      return { type: 'object', tsType: 'Date' }
+    } else {
+      return { type: primitiveToString( primitive )};
+    }
+  } 
+}
+
 type ArrayOrType = AlpacaType | AlpacaArray;
 
 interface extractedType {

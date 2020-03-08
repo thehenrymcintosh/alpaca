@@ -50,6 +50,10 @@ const options = {
 }
 const company = new AlpacaModel("Company", {
   name: name,
+  founded: {
+    type: new AlpacaArray( new AlpacaDate() ),
+    description: "My description"
+  }
 }, {
   ...options,
   nestedRest: [{path:"users",foreignField:"company",modelName:"User"}]

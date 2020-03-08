@@ -10,20 +10,16 @@ export interface User {
   email: string;
   company: Company[];
   _id: string;
-  updatedAt: {
-    [k: string]: any;
-  };
-  createdAt: {
-    [k: string]: any;
-  };
+  updatedAt: Date;
+  createdAt: Date;
 }
 export interface Company {
   name: string;
+  /**
+   * My description
+   */
+  founded: Date[];
   _id: string;
-  updatedAt: {
-    [k: string]: any;
-  };
-  createdAt: {
-    [k: string]: any;
-  };
+  updatedAt: Date;
+  createdAt: Date;
 }
